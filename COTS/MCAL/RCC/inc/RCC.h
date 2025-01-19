@@ -143,7 +143,7 @@
     Feature in PlatformIO:
         Project Inspect -> gives info about memory usage + static analysis for code
 */
-
+#include "RCC_PBCFG.h"
 
 typedef enum
 {
@@ -191,15 +191,28 @@ typedef unsigned char uint8_t;
 typedef unsigned short int uint16_t;
 typedef unsigned long int uint32_t;
 
-typedef struct 
+typedef enum 
 {
-    uint32_t M          : 6;
-    uint32_t N          : 9;
-    uint32_t P          : 2;
-    uint32_t PLL_SRC    : 1;
-    uint32_t Q          : 4; 
-    
-} MRCC_structPLLConfig_t;
+    PLL_M   = (MRCC_PLL_M_PRESCALER << 0)  & (0x0000003FULL),
+    PLL_N   = (MRCC_PLL_N_PRESCALER << 6)  & (0x00007FC0ULL),
+    PLL_P   = (MRCC_PLL_P_PRESCALER << 16) & (0x00030000ULL),
+    PLL_Q   = (MRCC_PLL_Q_PRESCALER << 24) & (0x0F000000ULL),
+    PLL_SRC = (MRCC_PLL_SRC << 22)         & (0x00400000ULL),
+    PLL_COMBINED_PRE = (PLL_M | PLL_N | PLL_P | PLL_Q | PLL_SRC),  /* use this value in PLL_config function */
+} MRCC_enuPLLConfig_t;
+
+// typedef enum
+// {
+//     ENABLE = 1,
+//     DISABLE = 0,
+//     RESET = 1,
+// } MRCC_enuPeripheralClkConfig_t;
+
+// typedef enum 
+// {
+//     AHB1_GPIOA = (1 << 0)  & (0x0000001ULL),
+// } MRCC_enuAHB1ClkConfig_t;
+
 
 #define COLLECT_PLL_CONFIGS(M, N, P, Q, PLL_SRC)    ((uint32_t)(((Q) << 24) | ((PLL_SRC) << 22) | ((P) << 16) | ((N) << 6) | ((M) < 0)))
 

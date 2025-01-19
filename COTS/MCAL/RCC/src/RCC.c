@@ -152,9 +152,9 @@ SRV_enuErrorStatus_t MRCC_enuConfigCSS(SRV_enuConfig_t copy_enuCSSConfig)
     return ret_enuErrStatus;
 }
 
-#define COLLECT_PLL_CONFIGS(M, N, P, Q, PLL_SRC)    ((uint32_t)(((Q) << 24) | ((PLL_SRC) << 22) | ((P) << 16) | ((N) << 6) | ((M) << 0)))
+// #define COLLECT_PLL_CONFIGS(M, N, P, Q, PLL_SRC)    ((uint32_t)(((Q) << 24) | ((PLL_SRC) << 22) | ((P) << 16) | ((N) << 6) | ((M) << 0)))
 /* this function takes the input inside the above macro */
-SRV_enuErrorStatus_t MRCC_enuConfigPLL(uint32_t copy_PLLConfig)
+SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_enuPLLConfig_t copy_enuPLLConfig)
 {
     SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
 
@@ -162,20 +162,20 @@ SRV_enuErrorStatus_t MRCC_enuConfigPLL(uint32_t copy_PLLConfig)
     {
         ret_enuErrStatus = RCC_PLL_CFG_WHILE_EN;
     }
-    else if ((copy_PLLConfig && RCC_PLL_MASK) == true)
+    else if ((copy_enuPLLConfig && RCC_PLL_MASK) == true)
     {
         ret_enuErrStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
-        if ((copy_PLLConfig & (1 << 22)) == 0) /* HSI */
+        if ((copy_enuPLLConfig & (1 << 22)) == 0) /* HSI */
         {
             /* check if it is ready + timeout */
             while (STATUS && TIMEOUT--);
 
             /* if exited due to timeout -> send error status */
         }
-        else if ((copy_PLLConfig & (1 << 22)) == 1) /* HSE */
+        else if ((copy_enuPLLConfig & (1 << 22)) == 1) /* HSE */
         {
             /* check if it is ready + timeout */
             while (STATUS && TIMEOUT--);
@@ -184,7 +184,7 @@ SRV_enuErrorStatus_t MRCC_enuConfigPLL(uint32_t copy_PLLConfig)
         }
 
         /* setting prescalers into register */
-        RCC->PLLCFGR_R = ((RCC->PLLCFGR_R & RCC_PLL_MASK) | copy_PLLConfig);
+        RCC->PLLCFGR_R = ((RCC->PLLCFGR_R & RCC_PLL_MASK) | copy_enuPLLConfig);
 
         /* enable PLL */
         RCC->CR = (RCC->CR & RCC_PLL_EN_MASK) | (1 << 24);
