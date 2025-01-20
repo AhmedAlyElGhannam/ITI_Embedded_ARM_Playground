@@ -201,77 +201,339 @@ typedef enum
     PLL_COMBINED_PRE = (PLL_M | PLL_N | PLL_P | PLL_Q | PLL_SRC),  /* use this value in PLL_config function */
 } MRCC_enuPLLConfig_t;
 
-// typedef enum
-// {
-//     ENABLE = 1,
-//     DISABLE = 0,
-//     RESET = 1,
-// } MRCC_enuPeripheralClkConfig_t;
-
-// typedef enum 
-// {
-//     AHB1_GPIOA = (1 << 0)  & (0x0000001ULL),
-// } MRCC_enuAHB1ClkConfig_t;
 
 
-#define COLLECT_PLL_CONFIGS(M, N, P, Q, PLL_SRC)    ((uint32_t)(((Q) << 24) | ((PLL_SRC) << 22) | ((P) << 16) | ((N) << 6) | ((M) < 0)))
+#define MRCC_AHB1_GPIOA_POS     (0UL)
+#define MRCC_AHB1_GPIOA_MSK     (0x1UL << MRCC_AHB1_GPIOA_POS)
+
+#define MRCC_AHB1_GPIOB_POS     (1UL)
+#define MRCC_AHB1_GPIOB_MSK     (0x1UL << MRCC_AHB1_GPIOB_POS)
+
+#define MRCC_AHB1_GPIOC_POS     (2UL)
+#define MRCC_AHB1_GPIOC_MSK     (0x1UL << MRCC_AHB1_GPIOC_POS)
+
+#define MRCC_AHB1_GPIOD_POS     (3UL)
+#define MRCC_AHB1_GPIOD_MSK     (0x1UL << MRCC_AHB1_GPIOD_POS)
+
+#define MRCC_AHB1_GPIOE_POS     (0UL)
+#define MRCC_AHB1_GPIOE_MSK     (0x1UL << MRCC_AHB1_GPIOE_POS)
+
+#define MRCC_AHB1_GPIOH_POS     (7UL)
+#define MRCC_AHB1_GPIOH_MSK     (0x1UL << MRCC_AHB1_GPIOH_POS)
+
+#define MRCC_AHB1_DMA1_POS      (21UL)
+#define MRCC_AHB1_DMA1_MSK      (0x1UL << MRCC_AHB1_DMA1_POS)
+
+#define MRCC_AHB1_DMA2_POS      (22UL)
+#define MRCC_AHB1_DMA2_MSK      (0x1UL << MRCC_AHB1_DMA2_POS)
+
+#define MRCC_AHB1_SRAM1_POS     (16UL)
+#define MRCC_AHB1_SRAM1_MSK     (0x1UL << MRCC_AHB1_SRAM1_POS)
+
+#define MRCC_AHB1_FLITF_POS     (15UL)
+#define MRCC_AHB1_FLITF_MSK     (0x1UL << MRCC_AHB1_FLITF_POS)
+
+#define MRCC_AHB1_CRC_POS       (12UL)
+#define MRCC_AHB1_CRC_MSK       (0x1UL << MRCC_AHB1_CRC_POS)
+
+#define MRCC_AHB2_USBOTG_POS       (7UL)
+#define MRCC_AHB2_USBOTG_MSK       (0x1UL << MRCC_AHB2_USBOTG_POS)
+
+#define MRCC_APB1_PWR_POS       (28UL)
+#define MRCC_APB1_PWR_MSK       (0x1UL << MRCC_APB1_PWR_POS)
+
+#define MRCC_APB1_I2C3_POS       (23UL)
+#define MRCC_APB1_I2C3_MSK       (0x1UL << MRCC_APB1_I2C3_POS)
+
+#define MRCC_APB1_I2C2_POS       (22UL)
+#define MRCC_APB1_I2C2_MSK       (0x1UL << MRCC_APB1_I2C2_POS)
+
+#define MRCC_APB1_I2C1_POS       (21UL)
+#define MRCC_APB1_I2C1_MSK       (0x1UL << MRCC_APB1_I2C1_POS)
+
+#define MRCC_APB1_USART2_POS       (17UL)
+#define MRCC_APB1_USART2_MSK       (0x1UL << MRCC_APB1_USART2_POS)
+
+#define MRCC_APB1_SPI3_POS       (15UL)
+#define MRCC_APB1_SPI3_MSK       (0x1UL << MRCC_APB1_SPI3_POS)
+
+#define MRCC_APB1_SPI2_POS       (14UL)
+#define MRCC_APB1_SPI2_MSK       (0x1UL << MRCC_APB1_SPI2_POS)
+
+#define MRCC_APB1_WWDG_POS       (11UL)
+#define MRCC_APB1_WWDG_MSK       (0x1UL << MRCC_APB1_WWDG_POS)
+
+#define MRCC_APB1_TIM5_POS       (3UL)
+#define MRCC_APB1_TIM5_MSK       (0x1UL << MRCC_APB1_TIM5_POS)
+
+#define MRCC_APB1_TIM4_POS       (2UL)
+#define MRCC_APB1_TIM4_MSK       (0x1UL << MRCC_APB1_TIM4_POS)
+
+#define MRCC_APB1_TIM3_POS       (1UL)
+#define MRCC_APB1_TIM3_MSK       (0x1UL << MRCC_APB1_TIM3_POS)
+
+#define MRCC_APB1_TIM2_POS       (0UL)
+#define MRCC_APB1_TIM2_MSK       (0x1UL << MRCC_APB1_TIM2_POS)
+
+#define MRCC_APB2_TIM11_POS       (18UL)
+#define MRCC_APB2_TIM11_MSK       (0x1UL << MRCC_APB2_TIM11_POS)
+
+#define MRCC_APB2_TIM10_POS       (17UL)
+#define MRCC_APB2_TIM10_MSK       (0x1UL << MRCC_APB2_TIM10_POS)
+
+#define MRCC_APB2_TIM9_POS       (16UL)
+#define MRCC_APB2_TIM9_MSK       (0x1UL << MRCC_APB2_TIM9_POS)
+
+#define MRCC_APB2_SYSCFG_POS       (28UL)
+#define MRCC_APB2_SYSCFG_MSK       (0x1UL << MRCC_APB2_SYSCFG_POS)
+
+#define MRCC_APB2_SPI4_POS       (13UL)
+#define MRCC_APB2_SPI4_MSK       (0x1UL << MRCC_APB2_SPI4_POS)
+
+#define MRCC_APB2_SPI1_POS       (12UL)
+#define MRCC_APB2_SPI1_MSK       (0x1UL << MRCC_APB2_SPI1_POS)
+
+#define MRCC_APB2_SDIO_POS       (11UL)
+#define MRCC_APB2_SDIO_MSK       (0x1UL << MRCC_APB2_SDIO_POS)
+
+#define MRCC_APB2_ADC1_POS       (8UL)
+#define MRCC_APB2_ADC1_MSK       (0x1UL << MRCC_APB2_ADC1_POS)
+
+#define MRCC_APB2_USART6_POS       (5UL)
+#define MRCC_APB2_USART6_MSK       (0x1UL << MRCC_APB2_USART6_POS)
+
+#define MRCC_APB2_USART1_POS       (4UL)
+#define MRCC_APB2_USART1_MSK       (0x1UL << MRCC_APB2_USART1_POS)
+
+#define MRCC_APB2_TIM1_POS       (0UL)
+#define MRCC_APB2_TIM1_MSK       (0x1UL << MRCC_APB2_TIM1_POS)
 
 
-SRV_enuErrorStatus_t MRCC_enuSelectSysClkSource();
 
-SRV_enuErrorStatus_t MRCC_enuCheckSysClkSource();
-
-SRV_enuErrorStatus_t MRCC_enuCheckPLLReadyStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckPLLI2SReadyStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckHSEReadyStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckHSIReadyStatus();
-
-SRV_enuErrorStatus_t MRCC_enuConfigCSS();
-SRV_enuErrorStatus_t MRCC_enuConfigPLL();
-SRV_enuErrorStatus_t MRCC_enuConfigPLLI2S(); // source && prescalers
-SRV_enuErrorStatus_t MRCC_enuConfigMCO(); // source && prescaler
-SRV_enuErrorStatus_t MRCC_enuConfigBusPrescaler(); // prescaler for APB1/2 && AHB1/2 (ignore the one for USBOTG)
-
-SRV_enuErrorStatus_t MRCC_enuResetPeripheralClk(); // mask for all peripheral resets
-SRV_enuErrorStatus_t MRCC_enuEnablePeripheralClk(); // mask for all peripheral resets
+/* SYSCFG CLK */
+#define MRCC_ENABLE_SYSCFG_CLK()        ((RCC->APB2ENR) |= MRCC_APB2_SYSCFG_MSK)
+#define MRCC_DISABLE_SYSCFG_CLK()       ((RCC->APB2ENR) &= ~MRCC_APB2_SYSCFG_MSK)
+#define MRCC_RESET_SYSCFG_CLK()         ((RCC->APB2RSTR) |= MRCC_APB2_SYSCFG_MSK)
+/***/
 
 
-SRV_enuErrorStatus_t MRCC_enuClrClkInterruptFlag(); // mask for all flags that has to be cleared
+/* SDIO */
+#define MRCC_ENABLE_SDIO_CLK()          ((RCC->APB2ENR) |= MRCC_APB2_SDIO_MSK)
+#define MRCC_DISABLE_SDIO_CLK()         ((RCC->APB2ENR) &= ~MRCC_APB2_SDIO_MSK)
+#define MRCC_RESET_SDIO_CLK()           ((RCC->APB2RSTR) |= MRCC_APB2_SDIO_MSK)
+/***/
 
-SRV_enuErrorStatus_t MRCC_enuEnableCSSInterrupt();
-SRV_enuErrorStatus_t MRCC_enuEnablePLLInterrupt();
-SRV_enuErrorStatus_t MRCC_enuEnablePLLI2SInterrupt();
-SRV_enuErrorStatus_t MRCC_enuEnableHSEInterrupt();
-SRV_enuErrorStatus_t MRCC_enuEnableHSIInterrupt();
-SRV_enuErrorStatus_t MRCC_enuEnableLSEInterrupt();
-SRV_enuErrorStatus_t MRCC_enuEnableLSIInterrupt();
 
-SRV_enuErrorStatus_t MRCC_enuCheckCSSInterruptFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckPLLInterruptFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckPLLI2SInterruptFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckHSEInterruptFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckHSIInterruptFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckLSEInterruptFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckLSIInterruptFlagStatus();
+/* USART */
+#define MRCC_ENABLE_USART6_CLK()        ((RCC->APB2ENR) |= MRCC_APB2_USART6_MSK)
+#define MRCC_ENABLE_USART2_CLK()        ((RCC->APB1ENR) |= MRCC_APB1_USART2_MSK)
+#define MRCC_ENABLE_USART1_CLK()        ((RCC->APB2ENR) |= MRCC_APB2_USART1_MSK)
 
-SRV_enuErrorStatus_t MRCC_enuConfigRTC();
+#define MRCC_DISABLE_USART6_CLK()       ((RCC->APB2ENR) &= ~MRCC_APB2_USART6_MSK)
+#define MRCC_DISABLE_USART2_CLK()       ((RCC->APB1ENR) &= ~MRCC_APB1_USART2_MSK)
+#define MRCC_DISABLE_USART1_CLK()       ((RCC->APB2ENR) &= ~MRCC_APB2_USART1_MSK)
 
-SRV_enuErrorStatus_t MRCC_enuEnableLSI();
-SRV_enuErrorStatus_t MRCC_enuCheckLSIReadyStatus();
+#define MRCC_RESET_USART6_CLK()         ((RCC->APB2RSTR) |= MRCC_APB2_USART6_MSK)
+#define MRCC_RESET_USART2_CLK()         ((RCC->APB1RSTR) |= MRCC_APB1_USART2_MSK)
+#define MRCC_RESET_USART1_CLK()         ((RCC->APB2RSTR) |= MRCC_APB2_USART1_MSK)
+/***/
 
-SRV_enuErrorStatus_t MRCC_enuEnableLSE();
-SRV_enuErrorStatus_t MRCC_enuCheckLSEReadyStatus();
 
-SRV_enuErrorStatus_t MRCC_enuConfigurePLLSpreadSpectrum();
+/* ADC CLK */
+#define MRCC_ENABLE_ADC1_CLK()          ((RCC->APB2ENR) |= MRCC_APB2_ADC1_MSK)
+#define MRCC_DISABLE_ADC1_CLK()         ((RCC->APB2ENR) &= ~MRCC_APB2_ADC1_MSK)
+#define MRCC_RESET_ADC1_CLK()           ((RCC->APB2RSTR) |= MRCC_APB2_ADC1_MSK)
+/***/
 
-SRV_enuErrorStatus_t MRCC_enuClrResetFlags();
 
-SRV_enuErrorStatus_t MRCC_enuCheckLPWRResetFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckWWDGResetFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckIWDGResetFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckPORResetFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckPINResetFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckBORResetFlagStatus();
+/* CRC CLK */
+#define MRCC_ENABLE_CRC_CLK()           ((RCC->APB1ENR) |= MRCC_AHB1_CRC_MSK)
+#define MRCC_DISABLE_CRC_CLK()          ((RCC->APB1ENR) &= ~MRCC_AHB1_CRC_MSK)
+#define MRCC_RESET_CRC_CLK()            ((RCC->APB1RSTR) |= MRCC_AHB1_CRC_MSK)
+/***/
+
+
+/* USBOTG CLK */
+#define MRCC_ENABLE_USBOTG_CLK()         ((RCC->AHB2ENR) |= MRCC_AHB2_USBOTG_MSK)
+#define MRCC_DISABLE_USBOTG_CLK()        ((RCC->AHB2ENR) &= ~MRCC_AHB2_USBOTG_MSK)
+#define MRCC_RESET_USBOTG_CLK()          ((RCC->AHB2RSTR) |= MRCC_AHB2_USBOTG_MSK)
+/***/
+
+
+
+/* WWDG CLK */
+#define MRCC_ENABLE_WWDG_CLK()           ((RCC->APB1ENR) |= MRCC_APB1_WWDG_MSK)
+#define MRCC_DISABLE_WWDG_CLK()          ((RCC->APB1ENR) &= ~MRCC_APB1_WWDG_MSK)
+#define MRCC_RESET_WWDG_CLK()            ((RCC->APB1RSTR) |= MRCC_APB1_WWDG_MSK)
+/***/
+
+/* PWR CLK */
+#define MRCC_ENABLE_PWR_CLK()           ((RCC->APB1ENR) |= MRCC_APB1_PWR_MSK)
+#define MRCC_DISABLE_PWR_CLK()          ((RCC->APB1ENR) &= ~MRCC_APB1_PWR_MSK)
+#define MRCC_RESET_PWR_CLK()            ((RCC->APB1RSTR) |= MRCC_APB1_PWR_MSK)
+/***/
+
+
+/* DMA CLK */
+#define MRCC_ENABLE_DMA2_CLK()          ((RCC->AHB1ENR) |= MRCC_AHB1_DMA2_MSK)
+#define MRCC_ENABLE_DMA1_CLK()          ((RCC->AHB1ENR) |= MRCC_AHB1_DMA1_MSK)
+
+#define MRCC_DISABLE_DMA2_CLK()         ((RCC->AHB1ENR) &= ~MRCC_AHB1_DMA2_MSK)
+#define MRCC_DISABLE_DMA1_CLK()         ((RCC->AHB1ENR) &= ~MRCC_AHB1_DMA1_MSK)
+
+#define MRCC_RESET_DMA2_CLK()           ((RCC->AHB1RSTR) |= MRCC_AHB1_DMA2_MSK)
+#define MRCC_RESET_DMA1_CLK()           ((RCC->AHB1RSTR) |= MRCC_AHB1_DMA1_MSK)
+/***/
+
+
+/* TIM CLK */
+#define MRCC_ENABLE_TIM11_CLK()         ((RCC->APB2ENR) |= MRCC_APB2_TIM11_MSK)
+#define MRCC_ENABLE_TIM10_CLK()         ((RCC->APB2ENR) |= MRCC_APB2_TIM10_MSK)
+#define MRCC_ENABLE_TIM9_CLK()          ((RCC->APB2ENR) |= MRCC_APB2_TIM9_MSK)
+#define MRCC_ENABLE_TIM5_CLK()          ((RCC->APB1ENR) |= MRCC_APB1_TIM5_MSK)
+#define MRCC_ENABLE_TIM4_CLK()          ((RCC->APB1ENR) |= MRCC_APB1_TIM4_MSK)
+#define MRCC_ENABLE_TIM3_CLK()          ((RCC->APB1ENR) |= MRCC_APB1_TIM3_MSK)
+#define MRCC_ENABLE_TIM2_CLK()          ((RCC->APB1ENR) |= MRCC_APB1_TIM2_MSK)
+#define MRCC_ENABLE_TIM1_CLK()          ((RCC->APB2ENR) |= MRCC_APB2_TIM1_MSK)
+
+#define MRCC_DISABLE_TIM11_CLK()        ((RCC->APB2ENR) &= ~MRCC_APB2_TIM11_MSK)
+#define MRCC_DISABLE_TIM10_CLK()        ((RCC->APB2ENR) &= ~MRCC_APB2_TIM10_MSK)
+#define MRCC_DISABLE_TIM9_CLK()         ((RCC->APB2ENR) &= ~MRCC_APB2_TIM9_MSK)
+#define MRCC_DISABLE_TIM5_CLK()         ((RCC->APB1ENR) &= ~MRCC_APB1_TIM5_MSK)
+#define MRCC_DISABLE_TIM4_CLK()         ((RCC->APB1ENR) &= ~MRCC_APB1_TIM4_MSK)
+#define MRCC_DISABLE_TIM3_CLK()         ((RCC->APB1ENR) &= ~MRCC_APB1_TIM3_MSK)
+#define MRCC_DISABLE_TIM2_CLK()         ((RCC->APB1ENR) &= ~MRCC_APB1_TIM2_MSK)
+#define MRCC_DISABLE_TIM1_CLK()         ((RCC->APB2ENR) &= ~MRCC_APB2_TIM1_MSK)
+
+#define MRCC_RESET_TIM11_CLK()          ((RCC->APB2RSTR) |= MRCC_APB2_TIM11_MSK)
+#define MRCC_RESET_TIM10_CLK()          ((RCC->APB2RSTR) |= MRCC_APB2_TIM10_MSK)
+#define MRCC_RESET_TIM9_CLK()           ((RCC->APB2RSTR) |= MRCC_APB2_TIM9_MSK)
+#define MRCC_RESET_TIM5_CLK()           ((RCC->APB1RSTR) |= MRCC_APB1_TIM5_MSK)
+#define MRCC_RESET_TIM4_CLK()           ((RCC->APB1RSTR) |= MRCC_APB1_TIM4_MSK)
+#define MRCC_RESET_TIM3_CLK()           ((RCC->APB1RSTR) |= MRCC_APB1_TIM3_MSK)
+#define MRCC_RESET_TIM2_CLK()           ((RCC->APB1RSTR) |= MRCC_APB1_TIM2_MSK)
+#define MRCC_RESET_TIM1_CLK()           ((RCC->APB2RSTR) |= MRCC_APB2_TIM1_MSK)
+/***/
+
+
+/* I2C CLK */
+#define MRCC_ENABLE_I2C3_CLK()          ((RCC->APB1ENR) |= MRCC_APB1_I2C3_MSK)      
+#define MRCC_ENABLE_I2C2_CLK()          ((RCC->APB1ENR) |= MRCC_APB1_I2C2_MSK)
+#define MRCC_ENABLE_I2C1_CLK()          ((RCC->APB1ENR) |= MRCC_APB1_I2C1_MSK)
+
+#define MRCC_DISABLE_I2C3_CLK()         ((RCC->APB1ENR) &= ~MRCC_APB1_I2C3_MSK)
+#define MRCC_DISABLE_I2C2_CLK()         ((RCC->APB1ENR) &= ~MRCC_APB1_I2C2_MSK)
+#define MRCC_DISABLE_I2C1_CLK()         ((RCC->APB1ENR) &= ~MRCC_APB1_I2C1_MSK)
+
+#define MRCC_RESET_I2C3_CLK()           ((RCC->APB1RSTR) |= MRCC_APB1_I2C3_MSK)
+#define MRCC_RESET_I2C2_CLK()           ((RCC->APB1RSTR) |= MRCC_APB1_I2C2_MSK)
+#define MRCC_RESET_I2C1_CLK()           ((RCC->APB1RSTR) |= MRCC_APB1_I2C1_MSK)
+/***/
+
+
+/* SPI CLK */
+#define MRCC_ENABLE_SPI4_CLK()          ((RCC->APB2ENR) |= MRCC_APB2_SPI4_MSK)
+#define MRCC_ENABLE_SPI3_CLK()          ((RCC->APB1ENR) |= MRCC_APB1_SPI3_MSK)
+#define MRCC_ENABLE_SPI2_CLK()          ((RCC->APB1ENR) |= MRCC_APB1_SPI2_MSK)
+#define MRCC_ENABLE_SPI1_CLK()          ((RCC->APB2ENR) |= MRCC_APB2_SPI1_MSK)
+
+#define MRCC_DISABLE_SPI4_CLK()         ((RCC->APB2ENR) &= ~MRCC_APB2_SPI4_MSK)
+#define MRCC_DISABLE_SPI3_CLK()         ((RCC->APB1ENR) &= ~MRCC_APB1_SPI3_MSK)
+#define MRCC_DISABLE_SPI2_CLK()         ((RCC->APB1ENR) &= ~MRCC_APB1_SPI2_MSK)
+#define MRCC_DISABLE_SPI1_CLK()         ((RCC->APB2ENR) &= ~MRCC_APB2_SPI1_MSK)
+
+#define MRCC_RESET_SPI4_CLK()           ((RCC->APB2RSTR) |= MRCC_APB2_SPI4_MSK)
+#define MRCC_RESET_SPI3_CLK()           ((RCC->APB1RSTR) |= MRCC_APB1_SPI3_MSK)   
+#define MRCC_RESET_SPI2_CLK()           ((RCC->APB1RSTR) |= MRCC_APB1_SPI2_MSK)   
+#define MRCC_RESET_SPI1_CLK()           ((RCC->APB2RSTR) |= MRCC_APB2_SPI1_MSK)   
+/***/
+
+
+/* GPIO CLK */
+#define MRCC_ENABLE_GPIOA_CLK()     ((RCC->AHB1ENR) |= MRCC_AHB1_GPIOA_MSK)
+#define MRCC_ENABLE_GPIOB_CLK()     ((RCC->AHB1ENR) |= MRCC_AHB1_GPIOB_MSK)
+#define MRCC_ENABLE_GPIOC_CLK()     ((RCC->AHB1ENR) |= MRCC_AHB1_GPIOC_MSK)
+#define MRCC_ENABLE_GPIOD_CLK()     ((RCC->AHB1ENR) |= MRCC_AHB1_GPIOD_MSK)
+#define MRCC_ENABLE_GPIOE_CLK()     ((RCC->AHB1ENR) |= MRCC_AHB1_GPIOE_MSK)
+#define MRCC_ENABLE_GPIOH_CLK()     ((RCC->AHB1ENR) |= MRCC_AHB1_GPIOH_MSK)
+
+#define MRCC_DISABLE_GPIOA_CLK()    ((RCC->AHB1ENR) &= ~MRCC_AHB1_GPIOA_MSK)    
+#define MRCC_DISABLE_GPIOB_CLK()    ((RCC->AHB1ENR) &= ~MRCC_AHB1_GPIOB_MSK)
+#define MRCC_DISABLE_GPIOC_CLK()    ((RCC->AHB1ENR) &= ~MRCC_AHB1_GPIOC_MSK)
+#define MRCC_DISABLE_GPIOD_CLK()    ((RCC->AHB1ENR) &= ~MRCC_AHB1_GPIOD_MSK)
+#define MRCC_DISABLE_GPIOE_CLK()    ((RCC->AHB1ENR) &= ~MRCC_AHB1_GPIOE_MSK)
+#define MRCC_DISABLE_GPIOH_CLK()    ((RCC->AHB1ENR) &= ~MRCC_AHB1_GPIOH_MSK)
+
+#define MRCC_RESET_GPIOA_CLK()      ((RCC->AHB1RSTR) |= MRCC_AHB1_GPIOA_MSK)
+#define MRCC_RESET_GPIOB_CLK()      ((RCC->AHB1RSTR) |= MRCC_AHB1_GPIOB_MSK)
+#define MRCC_RESET_GPIOC_CLK()      ((RCC->AHB1RSTR) |= MRCC_AHB1_GPIOC_MSK)
+#define MRCC_RESET_GPIOD_CLK()      ((RCC->AHB1RSTR) |= MRCC_AHB1_GPIOD_MSK)
+#define MRCC_RESET_GPIOE_CLK()      ((RCC->AHB1RSTR) |= MRCC_AHB1_GPIOE_MSK)
+#define MRCC_RESET_GPIOH_CLK()      ((RCC->AHB1RSTR) |= MRCC_AHB1_GPIOH_MSK)
+/***/
+
+
+SRV_enuErrorStatus_t MRCC_enuSetPLLConfig(MRCC_enuPLLConfig_t copy_enuPLLConfig);
+SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc();
+SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc();
+SRV_enuErrorStatus_t MRCC_enuSetCSSConfig();
+SRV_enuErrorStatus_t MRCC_enuSetPLLI2SConfig();
+SRV_enuErrorStatus_t MRCC_enuSetMCOConfig();
+SRV_enuErrorStatus_t MRCC_enuSetRTCConfig();
+SRV_enuErrorStatus_t MRCC_enuSetPLLSpreadSpectrumConfig();
+
+
+SRV_enuErrorStatus_t MRCC_enuSetPeripheralBusesPrescaler();
+SRV_enuErrorStatus_t MRCC_enuSetTimerPrescaler();
+
+SRV_enuErrorStatus_t MRCC_enuClrAllClkRstFlags();
+SRV_enuErrorStatus_t MRCC_enuClrAllClkIntFlags(); 
+
+
+
+
+#define MRCC_IS_LSE_READY()
+#define MRCC_IS_LSI_READY()
+#define MRCC_IS_PLL_READY()
+#define MRCC_IS_PLLI2S_READY()
+#define MRCC_IS_HSE_READY()
+#define MRCC_IS_HSI_READY()
+
+#define MRCC_LSE_BYPASS()
+
+#define MRCC_BACKUP_DOMAIN_RESET()
+
+#define MRCC_IS_PWR_RESET_FLAG_RAISED()
+#define MRCC_IS_WWDG_RESET_FLAG_RAISED()
+#define MRCC_IS_IWDG_RESET_FLAG_RAISED()
+#define MRCC_IS_POR_RESET_FLAG_RAISED()
+#define MRCC_IS_PIN_RESET_FLAG_RAISED()
+#define MRCC_IS_BOR_RESET_FLAG_RAISED()
+
+#define MRCC_IS_CSS_INT_FLAG_RAISED()
+#define MRCC_IS_PLL_INT_FLAG_RAISED()
+#define MRCC_IS_PLLI2S_INT_FLAG_RAISED()
+#define MRCC_IS_HSE_INT_FLAG_RAISED()
+#define MRCC_IS_HSI_INT_FLAG_RAISED()
+#define MRCC_IS_LSE_INT_FLAG_RAISED()
+#define MRCC_IS_LSI_INT_FLAG_RAISED()
+
+
+#define MRCC_ENABLE_CSS_INT()
+#define MRCC_ENABLE_PLL_INT()
+#define MRCC_ENABLE_PLLI2S_INT()
+#define MRCC_ENABLE_HSE_INT()
+#define MRCC_ENABLE_HSI_INT()
+#define MRCC_ENABLE_LSE_INT()
+#define MRCC_ENABLE_LSI_INT()
+
+#define MRCC_DISABLE_CSS_INT()
+#define MRCC_DISABLE_PLL_INT()
+#define MRCC_DISABLE_PLLI2S_INT()
+#define MRCC_DISABLE_HSE_INT()
+#define MRCC_DISABLE_HSI_INT()
+#define MRCC_DISABLE_LSE_INT()
+#define MRCC_DISABLE_LSI_INT()
 
 
 

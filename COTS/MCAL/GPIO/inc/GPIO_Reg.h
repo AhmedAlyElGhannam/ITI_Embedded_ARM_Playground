@@ -17,7 +17,7 @@ typedef struct
 
 #define GPIO_BASE_ADDRESS   ((GPIOx_Registers_t*)0x40020000ULL)
 #define GPIO_GET_PORT_ADDRESS(GPIOx)    \
-    (GPIO_BASE_ADDRESS + (GPIOx * 0x400))
+    (GPIO_BASE_ADDRESS + ((GPIOx_Registers_t*)(GPIOx * 0x400)))
 
 
 #endif
