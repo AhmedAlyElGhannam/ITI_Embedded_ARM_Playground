@@ -32,10 +32,6 @@ typedef enum
     MRCC_SYS_CLK_PLL = 0x00000010ULL,
 } MRCC_enuSYSCLK_t;
 
-typedef unsigned char uint8_t;
-typedef unsigned short int uint16_t;
-typedef unsigned long int uint32_t;
-
 typedef enum 
 {
     PLL_M   = (MRCC_PLL_M_PRESCALER << 0)  & (0x0000003FUL),
@@ -46,26 +42,11 @@ typedef enum
     PLL_COMBINED_PRE = (PLL_M | PLL_N | PLL_P | PLL_Q | PLL_SRC),  /* use this value in PLL_config function */
 } MRCC_enuPLLConfig_t;
 
-#define MRCC_APB_DIV_BY_2       (0b100UL)       
-#define MRCC_APB_DIV_BY_4       (0b101UL)
-#define MRCC_APB_DIV_BY_8       (0b110UL)
-#define MRCC_APB_DIV_BY_16      (0b111UL)
-
-#define MRCC_AHB_DIV_BY_2           (0b1000UL)
-#define MRCC_AHB_DIV_BY_4           (0b1001UL)
-#define MRCC_AHB_DIV_BY_8           (0b1010UL)
-#define MRCC_AHB_DIV_BY_16          (0b1011UL)
-#define MRCC_AHB_DIV_BY_64          (0b1100UL)
-#define MRCC_AHB_DIV_BY_128         (0b1101UL)
-#define MRCC_AHB_DIV_BY_256         (0b1110UL)
-#define MRCC_AHB_DIV_BY_512         (0b1111UL)
-
-
 typedef enum 
 {
-    AHB1_PRE = (MRCC_AHB_DIV_BY_2 << 4) & (0xF0UL),
-    APB1_PRE = (MRCC_APB_DIV_BY_4 << 10) & (0x1C00UL),
-    APB2_PRE = (MRCC_APB_DIV_BY_4 << 13) & (0xE000UL),
+    AHB1_PRE = (MRCC_AHB1_PRESCALER << 4) & (0xF0UL),
+    APB1_PRE = (MRCC_APB1_PRESCALER << 10) & (0x1C00UL),
+    APB2_PRE = (MRCC_APB2_PRESCALER << 13) & (0xE000UL),
     PERIPH_COMBINED_PRE = (AHB1_PRE | APB1_PRE | APB2_PRE),  /* use this value in bus prescaler function */
 } MRCC_enuPeriphBusPresConfig_t;
 
@@ -184,6 +165,21 @@ typedef enum
 
 #define MRCC_APB2_TIM1_POS       (0UL)
 #define MRCC_APB2_TIM1_MSK       (0x1UL << MRCC_APB2_TIM1_POS)
+
+#define MRCC_PLLI2SRDY_POS      (27UL)
+#define MRCC_PLLI2SRDY_MSK      (0x01UL << MRCC_PLLI2SRDY_POS)
+
+#define MRCC_PLLRDY_POS         (25UL)
+#define MRCC_PLLRDY_MSK         (0x01UL << MRCC_PLLRDY_POS)
+
+#define MRCC_HSERDY_POS         (17UL)
+#define MRCC_HSERDY_MSK         (0x01UL << MRCC_HSERDY_POS)
+
+#define MRCC_HSIRDY_POS         (1UL)
+#define MRCC_HSIRDY_MSK         (0x01UL << MRCC_HSERDY_POS)
+
+
+
 
 
 
@@ -362,72 +358,173 @@ SRV_enuErrorStatus_t MRCC_enuSetMCOConfig();
 SRV_enuErrorStatus_t MRCC_enuSetRTCConfig(); 
 SRV_enuErrorStatus_t MRCC_enuSetPLLSpreadSpectrumConfig(); 
 SRV_enuErrorStatus_t MRCC_enuSetTimerPrescaler();
-SRV_enuErrorStatus_t MRCC_enuClrAllClkIntFlags(MRCC_enuClrIntRdyFlags_t copy_enuIntFlags); 
 */
 
 
+#define MRCC_LSERDY_POS      (1UL)
+#define MRCC_LSERDY_MSK      (0x01UL << MRCC_LSERDY_POS)
+
+#define MRCC_LSIRDY_POS      (1UL)
+#define MRCC_LSIRDY_MSK      (0x01UL << MRCC_LSIRDY_POS)
+
+#define MRCC_LSEON_POS      (0UL)
+#define MRCC_LSEON_MSK      (0x01UL << MRCC_LSEON_POS)
+
+#define MRCC_LSION_POS      (0UL)
+#define MRCC_LSION_MSK      (0x01UL << MRCC_LSION_POS)
+
+#define MRCC_PLLI2SON_POS      (26UL)
+#define MRCC_PLLI2SON_MSK      (0x01UL << MRCC_PLLI2SON_POS)
+
+#define MRCC_PLLON_POS      (24UL)
+#define MRCC_PLLON_MSK      (0x01UL << MRCC_PLLON_POS)
+
+#define MRCC_HSEON_POS      (16UL)
+#define MRCC_HSEON_MSK      (0x01UL << MRCC_HSEON_POS)
+
+#define MRCC_HSION_POS      (0UL)
+#define MRCC_HSION_MSK      (0x01UL << MRCC_HSION_POS)
+
+
+#define MRCC_HSEBYP_POS      (18UL)
+#define MRCC_HSEBYP_MSK      (0x01UL << MRCC_HSEBYP_POS)
+
+#define MRCC_LSEBYP_POS      (2UL)
+#define MRCC_LSEBYP_MSK      (0x01UL << MRCC_LSEBYP_POS)
+
 #define MRCC_CLR_RST_FLAGS()    
 
-#define MRCC_IS_LSE_READY()
-#define MRCC_IS_LSI_READY()
-#define MRCC_IS_PLL_READY()
-#define MRCC_IS_PLLI2S_READY()
-#define MRCC_IS_HSE_READY()
-#define MRCC_IS_HSI_READY()
+#define MRCC_IS_LSE_READY()     ((RCC->BDCR) |= MRCC_LSERDY_MSK)
+#define MRCC_IS_LSI_READY()     ((RCC->BDCR) |= MRCC_LSIRDY_MSK)
+#define MRCC_IS_PLL_READY()     ((RCC->CR) |= MRCC_PLLRDY_MSK)
+#define MRCC_IS_PLLI2S_READY()  ((RCC->CR) |= MRCC_PLLI2SRDY_MSK)
+#define MRCC_IS_HSE_READY()     ((RCC->CR) |= MRCC_HSERDY_MSK)
+#define MRCC_IS_HSI_READY()     ((RCC->CR) |= MRCC_HSIRDY_MSK)
 
-#define MRCC_LSE_ENABLE()
-#define MRCC_LSI_ENABLE()
-#define MRCC_PLL_ENABLE()
-#define MRCC_PLLI2S_ENABLE()
-#define MRCC_HSE_ENABLE()
-#define MRCC_HSI_ENABLE()
+#define MRCC_LSE_ENABLE()       ((RCC->BDCR) |= MRCC_LSEON_MSK) 
+#define MRCC_LSI_ENABLE()       ((RCC->BDCR) |= MRCC_LSION_MSK) 
+#define MRCC_PLL_ENABLE()       ((RCC->CR) |= MRCC_PLLON_MSK)   
+#define MRCC_PLLI2S_ENABLE()    ((RCC->CR) |= MRCC_PLLI2SON_MSK)
+#define MRCC_HSE_ENABLE()       ((RCC->CR) |= MRCC_HSEON_MSK)   
+#define MRCC_HSI_ENABLE()       ((RCC->CR) |= MRCC_HSION_MSK)   
 
-#define MRCC_LSE_DISABLE()
-#define MRCC_LSI_DISABLE()
-#define MRCC_PLL_DISABLE()
-#define MRCC_PLLI2S_DISABLE()
-#define MRCC_HSE_DISABLE()
-#define MRCC_HSI_DISABLE()
+#define MRCC_LSE_DISABLE()      ((RCC->BDCR) &= ~MRCC_LSEON_MSK)
+#define MRCC_LSI_DISABLE()      ((RCC->BDCR) &= ~MRCC_LSION_MSK)
+#define MRCC_PLL_DISABLE()      ((RCC->CR) &= ~MRCC_PLLON_MSK)   
+#define MRCC_PLLI2S_DISABLE()   ((RCC->CR) &= ~MRCC_PLLI2SON_MSK)
+#define MRCC_HSE_DISABLE()      ((RCC->CR) &= ~MRCC_HSEON_MSK)   
+#define MRCC_HSI_DISABLE()      ((RCC->CR) &= ~MRCC_HSION_MSK)   
 
-#define MRCC_LSE_BYPASS()
-
-#define MRCC_BACKUP_DOMAIN_RESET()
-
-#define MRCC_IS_PWR_RESET_FLAG_RAISED()
-#define MRCC_IS_WWDG_RESET_FLAG_RAISED()
-#define MRCC_IS_IWDG_RESET_FLAG_RAISED()
-#define MRCC_IS_POR_RESET_FLAG_RAISED()
-#define MRCC_IS_PIN_RESET_FLAG_RAISED()
-#define MRCC_IS_BOR_RESET_FLAG_RAISED()
-
-#define MRCC_IS_CSS_INT_FLAG_RAISED()
-#define MRCC_IS_PLL_INT_FLAG_RAISED()
-#define MRCC_IS_PLLI2S_INT_FLAG_RAISED()
-#define MRCC_IS_HSE_INT_FLAG_RAISED()
-#define MRCC_IS_HSI_INT_FLAG_RAISED()
-#define MRCC_IS_LSE_INT_FLAG_RAISED()
-#define MRCC_IS_LSI_INT_FLAG_RAISED()
+#define MRCC_HSE_BYPASS()       ((RCC->CR) |= MRCC_HSEBYP_MSK)
+#define MRCC_LSE_BYPASS()       ((RCC->BDCR) |= MRCC_LSEBYP_MSK)
 
 
-#define MRCC_ENABLE_CSS_INT()
-#define MRCC_ENABLE_PLL_INT()
-#define MRCC_ENABLE_PLLI2S_INT()
-#define MRCC_ENABLE_HSE_INT()
-#define MRCC_ENABLE_HSI_INT()
-#define MRCC_ENABLE_LSE_INT()
-#define MRCC_ENABLE_LSI_INT()
 
-#define MRCC_DISABLE_CSS_INT()
-#define MRCC_DISABLE_PLL_INT()
-#define MRCC_DISABLE_PLLI2S_INT()
-#define MRCC_DISABLE_HSE_INT()
-#define MRCC_DISABLE_HSI_INT()
-#define MRCC_DISABLE_LSE_INT()
-#define MRCC_DISABLE_LSI_INT()
 
-#define MRCC_DISABLE_ALL_INT()
-#define MRCC_ENABLE_ALL_INT()
 
+
+
+
+#define MRCC_BDRST_POS      (16UL)
+#define MRCC_BDRST_MSK      (0x01UL << MRCC_BDRST_POS)
+
+
+#define MRCC_BACKUP_DOMAIN_RESET()  ((RCC->BDCR) |= MRCC_BDRST_MSK)
+
+
+
+#define MRCC_LPWRRSTF_POS       (31UL)
+#define MRCC_WWDGRSTF_POS       (30UL)
+#define MRCC_IWDGRSTF_POS       (29UL)
+#define MRCC_SFTRSTF_POS       (28UL)
+#define MRCC_PORRSTF_POS       (27UL)
+#define MRCC_PINRSTF_POS       (26UL)
+#define MRCC_BORRSTF_POS       (25UL)
+
+
+#define MRCC_IS_LPWR_RESET_FLAG_RAISED()    (((RCC->CSR) >> MRCC_LPWRRSTF_POS) & 0x01UL)    
+#define MRCC_IS_WWDG_RESET_FLAG_RAISED()    (((RCC->CSR) >> MRCC_WWDGRSTF_POS) & 0x01UL)
+#define MRCC_IS_IWDG_RESET_FLAG_RAISED()    (((RCC->CSR) >> MRCC_IWDGRSTF_POS) & 0x01UL)
+#define MRCC_IS_SFTRESET_FLAG_RAISED()      (((RCC->CSR) >> MRCC_SFTRSTF_POS) & 0x01UL)
+#define MRCC_IS_POR_RESET_FLAG_RAISED()     (((RCC->CSR) >> MRCC_PORRSTF_POS) & 0x01UL)
+#define MRCC_IS_PIN_RESET_FLAG_RAISED()     (((RCC->CSR) >> MRCC_PINRSTF_POS) & 0x01UL)
+#define MRCC_IS_BOR_RESET_FLAG_RAISED()     (((RCC->CSR) >> MRCC_BORRSTF_POS) & 0x01UL)
+
+
+#define MRCC_RMVF_POS      (24UL)
+#define MRCC_RMVF_MSK      (0x01UL << MRCC_RMVF_POS)
+
+#define MRCC_CLR_ALL_RESET_FLAGS()          ((RCC->CSR) |= MRCC_RMVF_MSK)
+
+
+#define MRCC_LSIRDYIF_POS      (0UL)
+#define MRCC_LSIRDYIF_MSK      (0x01UL << MRCC_LSIRDYIF_POS)
+
+#define MRCC_LSERDYIF_POS      (1UL)
+#define MRCC_LSERDYIF_MSK      (0x01UL << MRCC_LSERDYIF_POS)
+
+#define MRCC_HSIRDYIF_POS      (2UL)
+#define MRCC_HSIRDYIF_MSK      (0x01UL << MRCC_HSIRDYIF_POS)
+
+#define MRCC_HSERDYIF_POS      (3UL)
+#define MRCC_HSERDYIF_MSK      (0x01UL << MRCC_HSERDYIF_POS)
+
+#define MRCC_PLLI2SRDYIF_POS      (5UL)
+#define MRCC_PLLI2SRDYIF_MSK      (0x01UL << MRCC_PLLI2SRDYIF_POS)
+
+#define MRCC_PLLRDYIF_POS      (4UL)
+#define MRCC_PLLRDYIF_MSK      (0x01UL << MRCC_PLLRDYIF_POS)
+
+#define MRCC_CSSF_POS      (7UL)
+#define MRCC_CSSF_MSK      (0x01UL << MRCC_CSSF_POS)
+
+
+#define MRCC_LSIRDYIE_POS      (8UL)
+#define MRCC_LSIRDYIE_MSK      (0x01UL << MRCC_LSIRDYIE_POS)
+
+#define MRCC_LSERDYIE_POS      (9UL)
+#define MRCC_LSERDYIE_MSK      (0x01UL << MRCC_LSERDYIE_POS)
+
+#define MRCC_HSIRDYIE_POS      (10UL)
+#define MRCC_HSIRDYIE_MSK      (0x01UL << MRCC_HSIRDYIE_POS)
+
+#define MRCC_HSERDYIE_POS      (11UL)
+#define MRCC_HSERDYIE_MSK      (0x01UL << MRCC_HSERDYIE_POS)
+
+#define MRCC_PLLI2SRDYIE_POS      (13UL)
+#define MRCC_PLLI2SRDYIE_MSK      (0x01UL << MRCC_PLLI2SRDYIE_POS)
+
+#define MRCC_PLLRDYIE_POS      (12UL)
+#define MRCC_PLLRDYIE_MSK      (0x01UL << MRCC_PLLRDYIE_POS)
+
+
+#define MRCC_IS_CSS_INT_FLAG_RAISED()       (((RCC->CIR) >> MRCC_CSSF_POS) & 0x01UL)
+#define MRCC_IS_PLL_INT_FLAG_RAISED()       (((RCC->CIR) >> MRCC_PLLRDYIF_POS) & 0x01UL)
+#define MRCC_IS_PLLI2S_INT_FLAG_RAISED()    (((RCC->CIR) >> MRCC_PLLI2SRDYIF_POS) & 0x01UL)
+#define MRCC_IS_HSE_INT_FLAG_RAISED()       (((RCC->CIR) >> MRCC_HSERDYIF_POS) & 0x01UL)
+#define MRCC_IS_HSI_INT_FLAG_RAISED()       (((RCC->CIR) >> MRCC_HSIRDYIF_POS) & 0x01UL)
+#define MRCC_IS_LSE_INT_FLAG_RAISED()       (((RCC->CIR) >> MRCC_LSERDYIF_POS) & 0x01UL)
+#define MRCC_IS_LSI_INT_FLAG_RAISED()       (((RCC->CIR) >> MRCC_LSIRDYIF_POS) & 0x01UL)
+
+
+#define MRCC_ENABLE_PLL_INT()               ((RCC->CIR) |= MRCC_PLLRDYIE_MSK)   
+#define MRCC_ENABLE_PLLI2S_INT()            ((RCC->CIR) |= MRCC_PLLI2SRDYIE_MSK)
+#define MRCC_ENABLE_HSE_INT()               ((RCC->CIR) |= MRCC_HSERDYIE_MSK)   
+#define MRCC_ENABLE_HSI_INT()               ((RCC->CIR) |= MRCC_HSIRDYIE_MSK)   
+#define MRCC_ENABLE_LSE_INT()               ((RCC->CIR) |= MRCC_LSERDYIE_MSK)   
+#define MRCC_ENABLE_LSI_INT()               ((RCC->CIR) |= MRCC_LSIRDYIE_MSK)   
+
+#define MRCC_DISABLE_PLL_INT()              ((RCC->CIR) &= ~MRCC_PLLRDYIE_MSK)   
+#define MRCC_DISABLE_PLLI2S_INT()           ((RCC->CIR) &= ~MRCC_PLLI2SRDYIE_MSK)
+#define MRCC_DISABLE_HSE_INT()              ((RCC->CIR) &= ~MRCC_HSERDYIE_MSK)   
+#define MRCC_DISABLE_HSI_INT()              ((RCC->CIR) &= ~MRCC_HSIRDYIE_MSK)   
+#define MRCC_DISABLE_LSE_INT()              ((RCC->CIR) &= ~MRCC_LSERDYIE_MSK)   
+#define MRCC_DISABLE_LSI_INT()              ((RCC->CIR) &= ~MRCC_LSIRDYIE_MSK)   
+
+#define MRCC_DISABLE_ALL_INT() \
+    ((RCC->CIR) &= ~(MRCC_LSIRDYIE_MSK | MRCC_LSERDYIE_MSK | MRCC_HSIRDYIE_MSK | MRCC_HSERDYIE_MSK | MRCC_PLLI2SRDYIE_MSK | MRCC_PLLRDYIE_MSK))  
+#define MRCC_ENABLE_ALL_INT() \
+    ((RCC->CIR) |= (MRCC_LSIRDYIE_MSK | MRCC_LSERDYIE_MSK | MRCC_HSIRDYIE_MSK | MRCC_HSERDYIE_MSK | MRCC_PLLI2SRDYIE_MSK | MRCC_PLLRDYIE_MSK))  
 
 
 

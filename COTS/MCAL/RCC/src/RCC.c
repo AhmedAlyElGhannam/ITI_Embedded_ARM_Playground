@@ -1,79 +1,116 @@
+/**
+ * @file RCC.c
+ * @brief This file contains the implementation of RCC (Reset and Clock Control) driver functions.
+ */
+
 #include "std_types.h"
 #include "error_status.h"
 #include "RCC_Reg.h"
 #include "RCC_PBCFG.h"
 #include "RCC.h"
 
+/** @defgroup RCC_Timeout_Configuration 
+ *  @brief Macros related to RCC timeout settings.
+ *  @{ */
+#define MRCC_WAIT_TIMEOUT   1000 /**< Timeout value for RCC operations */
+/** @} */
 
-/*
-    CFGR -> to set clock source and prescaler of:
-            MCO1 && MCO2
-         -> to set the prescaler of:
-            AHB && APB
-         -> clock selection of I2S
-         -> select system clock && read the selected system clock ###
-*/
+/** @defgroup RCC_Clock_Source_Masks
+ *  @brief Macros for masking and configuring system clock sources.
+ *  @{ */
+#define RCC_SYS_CLK_SET_MASK                (0xFFFFFFFCUL) /**< Mask for setting the system clock source */
+#define RCC_SYS_CLK_GET_MASK                (0xFFFFFFF3UL) /**< Mask for getting the system clock source */
+/** @} */
 
+/** @defgroup RCC_Ready_Masks
+ *  @brief Macros for checking readiness of various clocks.
+ *  @{ */
+#define RCC_PLL_CLK_READY_MASK              (0xFDFFFFFFULL) /**< Mask for PLL clock readiness */
+#define RCC_PLLI2S_CLK_READY_MASK           (0xF7FFFFFFULL) /**< Mask for PLLI2S clock readiness */
+#define RCC_HSE_CLK_READY_MASK              (0xFFFDFFFFULL) /**< Mask for HSE clock readiness */
+#define RCC_HSI_CLK_READY_MASK              (0x00000001ULL) /**< Mask for HSI clock readiness */
+#define RCC_CSS_EN_MASK                     (0xFFF7FFFFULL) /**< Mask for CSS enable */
+/** @} */
 
-#define MRCC_WAIT_TIMEOUT   1000
+/** @defgroup RCC_PLL_Masks
+ *  @brief Macros for configuring and enabling PLL.
+ *  @{ */
+#define RCC_PLL_MASK                        (0xF0BC8000ULL) /**< Mask for PLL configuration */
+#define RCC_PLL_EN_MASK                     (0xFEFFFFFFULL) /**< Mask for enabling PLL */
+/** @} */
 
+/** @defgroup RCC_Bus_Prescaler_Masks
+ *  @brief Macros for configuring bus prescalers.
+ *  @{ */
+#define RCC_BUS_PRESCALER_MASK              (0xFFFF030FULL) /**< Mask for bus prescaler configuration */
+#define RCC_AHB1_PERIPHERAL_CLK_MASK        (0xFF9FEF60ULL) /**< Mask for AHB1 peripheral clock configuration */
+#define RCC_AHB2_PERIPHERAL_CLK_MASK        (0x00000080ULL) /**< Mask for AHB2 peripheral clock configuration */
+#define RCC_APB1_PERIPHERAL_CLK_MASK        (0xEF1D37F0ULL) /**< Mask for APB1 peripheral clock configuration */
+#define RCC_APB2_PERIPHERAL_CLK_MASK        (0xFFF886CEULL) /**< Mask for APB2 peripheral clock configuration */
+/** @} */
 
-/* MASKS (Should not be visible/accessible to user) */
-#define RCC_SYS_CLK_SET_MASK                (0xFFFFFFFCUL)
-#define RCC_SYS_CLK_GET_MASK                (0xFFFFFFF3UL)
+/** @defgroup RCC_Validation_Macros
+ *  @brief Macros for validating various RCC parameters.
+ *  @{ */
+#define IS_INVALID_ALL_BUS_PRESCALER(PRE)   ((PRE & RCC_BUS_PRESCALER_MASK) != 0x00UL) /**< Checks if the bus prescaler configuration is invalid */
+#define IS_PLL_CLK_SRC_HSI(SRC)             (((SRC >> 22) & (1U)) == 0x00UL) /**< Checks if the PLL clock source is HSI */
+#define IS_PLL_CLK_SRC_HSE(SRC)             (((SRC >> 22) & (1U)) == 0x01UL) /**< Checks if the PLL clock source is HSE */
+#define IS_VALID_PLL_CONFIG(CFG)            ((CFG & RCC_PLL_MASK) != 0x00UL) /**< Checks if the PLL configuration is valid */
+#define IS_NULL_PTR(PTR)                    (PTR == NULL) /**< Checks if a pointer is null */
+#define IS_VALID_SYS_CLK_SRC(SYSCLK)        ((SYSCLK != MRCC_SYS_CLK_HSI) && (SYSCLK != MRCC_SYS_CLK_HSE) && (SYSCLK != MRCC_SYS_CLK_PLL)) /**< Checks if the system clock source is valid */
+/** @} */
 
-
-#define RCC_PLL_CLK_READY_MASK              (0xFDFFFFFFULL)
-#define RCC_PLLI2S_CLK_READY_MASK           (0xF7FFFFFFULL)
-#define RCC_HSE_CLK_READY_MASK              (0xFFFDFFFFULL)
-#define RCC_HSI_CLK_READY_MASK              (0x00000001ULL)
-#define RCC_CSS_EN_MASK                     (0xFFF7FFFFULL)
-#define RCC_PLL_MASK                        (0xF0BC8000ULL)
-#define RCC_PLL_EN_MASK                     (0xFEFFFFFFULL)
-#define RCC_BUS_PRESCALER_MASK              (0xFFFF030FULL)
-#define RCC_AHB1_PERIPHERAL_CLK_MASK        (0xFF9FEF60ULL)
-#define RCC_AHB2_PERIPHERAL_CLK_MASK        (0x00000080ULL)
-#define RCC_APB1_PERIPHERAL_CLK_MASK        (0xEF1D37F0ULL)
-#define RCC_APB2_PERIPHERAL_CLK_MASK        (0xFFF886CEULL)
-
-
+/**
+ * @brief Sets the system clock source.
+ *
+ * @param copy_enuSysClkSrc Desired system clock source.
+ * @return SRV_enuErrorStatus_t Error status of the operation.
+ */
 SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc(MRCC_enuSYSCLK_t copy_enuSysClkSrc)
 {
     SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
-    if ((copy_enuSysClkSrc != MRCC_SYS_CLK_HSI) && (copy_enuSysClkSrc != MRCC_SYS_CLK_HSE) && (copy_enuSysClkSrc != MRCC_SYS_CLK_PLL))
+    if (IS_VALID_SYS_CLK_SRC(copy_enuSysClkSrc))
     {
         ret_enuErrorStatus = RCC_INV_CLK_SRC;
     }
     else
     {
-        /* set sys clk source */
+        /* Set system clock source */
         RCC->CFGR = ((RCC->CFGR & RCC_SYS_CLK_SET_MASK) | copy_enuSysClkSrc);
     }
 
     return ret_enuErrorStatus;
 }
 
-
+/**
+ * @brief Gets the current system clock source.
+ *
+ * @param ptr_uint32SysClkSrc Pointer to store the current system clock source.
+ * @return SRV_enuErrorStatus_t Error status of the operation.
+ */
 SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc(uint32_t* ptr_uint32SysClkSrc)
 {
     SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
-    if (ptr_uint32UsedSysClk == NULL)
+    if (IS_NULL_PTR(ptr_uint32SysClkSrc))
     {
-        ptr_uint32SysClkSrc = NULL_PTR;
+        ret_enuErrorStatus = NULL_PTR;
     }
     else
     {
-        #define SYS_CLK_SRC_POS   (2) 
-
-        (*ptr_uint32UsedSysClk) = ((RCC->CFGR & ~RCC_SYS_CLK_GET_MASK) >> SYS_CLK_SRC_POS);
+        (*ptr_uint32SysClkSrc) = ((RCC->CFGR & ~RCC_SYS_CLK_GET_MASK) >> 2);
     }
 
     return ret_enuErrorStatus;
 }
 
-/* this function takes the input inside the above macro */
+/**
+ * @brief Configures the PLL (Phase Locked Loop).
+ *
+ * @param copy_enuPLLConfig Desired PLL configuration.
+ * @return SRV_enuErrorStatus_t Error status of the operation.
+ */
 SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_enuPLLConfig_t copy_enuPLLConfig)
 {
     SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
@@ -83,328 +120,60 @@ SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_enuPLLConfig_t copy_enuPLLConfig)
     {
         ret_enuErrorStatus = RCC_PLL_CFG_WHILE_EN;
     }
-    else if ((copy_enuPLLConfig && RCC_PLL_MASK) == true)
+    else if (IS_VALID_PLL_CONFIG(copy_enuPLLConfig))
     {
         ret_enuErrorStatus = INV_ARG;
     }
-    else /* arguments are valid */
+    else
     {
-        if (((copy_enuPLLConfig >> 22) & (1U)) == 0) /* HSI */
+        if (IS_PLL_CLK_SRC_HSI(copy_enuPLLConfig)) /* HSI */
         {
-            /* check if it is ready + timeout */
             while (MRCC_IS_HSI_READY() && local_uint16WaitTimeout--);
         }
-        else if (((copy_enuPLLConfig >> 22) & (1U)) == 1) /* HSE */
+        else if (IS_PLL_CLK_SRC_HSE(copy_enuPLLConfig)) /* HSE */
         {
-            /* check if it is ready + timeout */
             while (MRCC_IS_HSE_READY() && local_uint16WaitTimeout--);
         }
-        else {}
 
-        /* if exited due to timeout -> return error status */
         if (local_uint16WaitTimeout == 0)
         {
             ret_enuErrorStatus = RCC_TIMEOUT;
         }
         else
         {
-            /* setting prescalers into register */
             RCC->PLLCFGR_R = ((RCC->PLLCFGR_R & RCC_PLL_MASK) | copy_enuPLLConfig);
-
-            /* enable PLL */
             MRCC_PLL_ENABLE();
-            /*RCC->CR = (RCC->CR & RCC_PLL_EN_MASK) | (1 << 24);*/
-
-            /* wait until PLL is ready */
             local_uint16WaitTimeout = MRCC_WAIT_TIMEOUT;
             while (MRCC_IS_PLL_READY() && local_uint16WaitTimeout--);
 
-            /* if exited due to timeout -> return error status */
             if (local_uint16WaitTimeout == 0)
             {
                 ret_enuErrorStatus = RCC_TIMEOUT;
             }
-            else {} /* exit function normally */
         }
     }
 
-    return ret_enuErrorStatus;    
+    return ret_enuErrorStatus;
 }
 
-
+/**
+ * @brief Sets the peripheral bus prescaler configuration.
+ *
+ * @param copy_enuBusPrescalers Desired bus prescaler configuration.
+ * @return SRV_enuErrorStatus_t Error status of the operation.
+ */
 SRV_enuErrorStatus_t MRCC_enuSetPeripheralBusesPrescaler(MRCC_enuPeriphBusPresConfig_t copy_enuBusPrescalers)
 {
-
-}
-
-
-
-
-
-
-
-
-
-
-
-// ((RCC->CR & ~RCC_PLL_CLK_READY_MASK) >> PLL_CLK_READY_POS);
-// ((RCC->CR & ~RCC_PLLI2S_CLK_READY_MASK) >> PLLI2S_CLK_READY_POS);
-// ((RCC->CR & ~RCC_HSE_CLK_READY_MASK) >> HSE_CLK_READY_POS);
-// ((RCC->CR & ~RCC_HSI_CLK_READY_MASK) >> HSI_CLK_READY_POS);
-// (RCC->CR & RCC_CSS_EN_MASK) | copy_enuCSSConfig;
-
-
-
-
-// #define COLLECT_PLL_CONFIGS(M, N, P, Q, PLL_SRC)    ((uint32_t)(((Q) << 24) | ((PLL_SRC) << 22) | ((P) << 16) | ((N) << 6) | ((M) << 0)))
-
-
-// #define COLLECT_PLLI2S_CONFIGS(R, N, PLLI2S_SRC)    ((uint32_t)(((R) << 28) | ((PLL_SRC) << 22) | ((P) << 16) | ((N) << 6) | ((M) < 0)))
-
-// SRV_enuErrorStatus_t MRCC_enuConfigPLLI2S() // source && prescalers
-// {
-
-// }
-// SRV_enuErrorStatus_t MRCC_enuConfigMCO() // source && prescaler
-// {
-
-// }
-
-#define COLLECT_BUS_PRESCALERS(APB2, APB1, AHB)    ((uint32_t)(((Q) << 24) | ((PLL_SRC) << 22) | ((P) << 16) | ((N) << 6) | ((M) << 0)))
-
-SRV_enuErrorStatus_t MRCC_enuConfigBusPrescaler(uint32_t copy_uint32BusPrescalers) // prescaler for APB1/2 && AHB1/2 (ignore the one for USBOTG)
-{
     SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
-    if ((copy_uint32BusPrescalers && RCC_BUS_PRESCALER_MASK) == true)
+    if (IS_INVALID_ALL_BUS_PRESCALER(copy_enuBusPrescalers))
     {
         ret_enuErrorStatus = INV_ARG;
     }
-    else /* arguments are valid */
+    else
     {
-        /* setting prescalers into register */
-        RCC->PLLCFGR_R = ((RCC->PLLCFGR_R & RCC_BUS_PRESCALER_MASK) | copy_uint32BusPrescalers);
+        RCC->CFGR = ((RCC->CFGR & RCC_BUS_PRESCALER_MASK) | copy_enuBusPrescalers);
     }
 
     return ret_enuErrorStatus;
 }
-
-#define COLLECT_AHB1_PERPHERALS(GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOH, CRC, DMA1, DMA2)    \
-((uint32_t)(((DMA2) << 22) | ((DMA1) << 21) | ((CRC) << 12) | ((GPIOH) << 7) | ((GPIOE) << 4) | ((GPIOD) << 3) | ((GPIOC) << 2) | ((GPIOB) << 1) | ((GPIOA) << 0)))
-
-SRV_enuErrorStatus_t MRCC_enuResetAHB1PeripheralClk(uint32_t copy_uint32AHB1Peripherals) // mask for all peripheral resets
-{
-    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-
-    if ((copy_uint32AHB1Peripherals && RCC_AHB1_PERIPHERAL_CLK_MASK) == true)
-    {
-        ret_enuErrorStatus = INV_ARG;
-    }
-    else /* arguments are valid */
-    {
-        /* setting prescalers into register */
-        RCC->AHB1RSTR = ((RCC->AHB1RSTR & RCC_AHB1_PERIPHERAL_CLK_MASK) | copy_uint32AHB1Peripherals);
-    }
-
-    return ret_enuErrorStatus;
-}
-
-#define COLLECT_AHB2_PERPHERALS(USBOTG)    \
-((uint32_t)(((USBOTG) << 7)))
-
-SRV_enuErrorStatus_t MRCC_enuResetAHB2PeripheralClk(uint32_t copy_uint32AHB2Peripherals) // mask for all peripheral resets
-{
-    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-
-    if ((copy_uint32AHB2Peripherals && RCC_AHB2_PERIPHERAL_CLK_MASK) == true)
-    {
-        ret_enuErrorStatus = INV_ARG;
-    }
-    else /* arguments are valid */
-    {
-        /* setting prescalers into register */
-        RCC->AHB2RSTR = ((RCC->AHB2RSTR & RCC_AHB2_PERIPHERAL_CLK_MASK) | copy_uint32AHB2Peripherals);
-    }
-
-    return ret_enuErrorStatus;
-}
-
-#define COLLECT_APB1_PERPHERALS(TIM2RST, TIM3RST, TIM4RST, TIM5RST, WWDGRST, SPI2RST, SPI3RST, USART2RST, I2C1RST, IC2RST, I2C3RST, PWRRST)    \
-((uint32_t)(((TIM2RST) << 0) | ((TIM3RST) << 1) | ((TIM4RST) << 2) | ((TIM5RST) << 3) | ((WWDGRST) << 11) | ((SPI2RST) << 14) | ((SPI3RST) << 15) | ((USART2RST) << 17) | ((I2C1RST) << 21) | ((IC2RST) << 22) | ((I2C3RST) << 23) | ((PWRRST) << 28)))
-
-SRV_enuErrorStatus_t MRCC_enuResetAPB1PeripheralClk(uint32_t copy_uint32APB1Peripherals) // mask for all peripheral resets
-{
-    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-
-    if ((copy_uint32APB1Peripherals && RCC_APB1_PERIPHERAL_CLK_MASK) == true)
-    {
-        ret_enuErrorStatus = INV_ARG;
-    }
-    else /* arguments are valid */
-    {
-        /* setting prescalers into register */
-        RCC->APB1RSTR = ((RCC->APB1RSTR & RCC_APB1_PERIPHERAL_CLK_MASK) | copy_uint32APB1Peripherals);
-    }
-
-    return ret_enuErrorStatus;
-}
-
-#define COLLECT_APB2_PERPHERALS(TIM1RST, USART1RST, USART6RST, ADC1RST, SDIORST, SPI1RST, SPI4RST, SYSCFGRST, TIM9RST, TIM10RST, TIM11RST)    \
-((uint32_t)(((TIM1RST) << 0) | ((USART1RST) << 4) | ((USART6RST) << 5) | ((ADC1RST) << 8) | ((SDIORST) << 11) | ((SPI1RST) << 12) | ((SPI4RST) << 13) | ((SYSCFGRST) << 14) | ((TIM9RST) << 16) | ((TIM10RST) << 17) | ((TIM11RST) << 18)))
-
-SRV_enuErrorStatus_t MRCC_enuResetAPB2PeripheralClk(uint32_t copy_uint32APB2Peripherals) // mask for all peripheral resets
-{
-    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-
-    if ((copy_uint32APB2Peripherals && RCC_APB2_PERIPHERAL_CLK_MASK) == true)
-    {
-        ret_enuErrorStatus = INV_ARG;
-    }
-    else /* arguments are valid */
-    {
-        /* setting prescalers into register */
-        RCC->APB2RSTR = ((RCC->APB2RSTR & RCC_APB2_PERIPHERAL_CLK_MASK) | copy_uint32APB2Peripherals);
-    }
-
-    return ret_enuErrorStatus;
-}
-
-
-SRV_enuErrorStatus_t MRCC_enuEnableAHB1PeripheralClk(uint32_t copy_uint32AHB1Peripherals) // mask for all peripheral resets
-{
-    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-
-    if ((copy_uint32AHB1Peripherals && RCC_AHB1_PERIPHERAL_CLK_MASK) == true)
-    {
-        ret_enuErrorStatus = INV_ARG;
-    }
-    else /* arguments are valid */
-    {
-        /* setting prescalers into register */
-        RCC->AHB1ENR = ((RCC->AHB1ENR & RCC_AHB1_PERIPHERAL_CLK_MASK) | copy_uint32AHB1Peripherals);
-    }
-
-    return ret_enuErrorStatus;
-}
-
-
-SRV_enuErrorStatus_t MRCC_enuEnableAHB2PeripheralClk(uint32_t copy_uint32AHB2Peripherals) // mask for all peripheral resets
-{
-    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-
-    if ((copy_uint32AHB2Peripherals && RCC_AHB2_PERIPHERAL_CLK_MASK) == true)
-    {
-        ret_enuErrorStatus = INV_ARG;
-    }
-    else /* arguments are valid */
-    {
-        /* setting prescalers into register */
-        RCC->AHB2ENR = ((RCC->AHB2ENR & RCC_AHB2_PERIPHERAL_CLK_MASK) | copy_uint32AHB2Peripherals);
-    }
-
-    return ret_enuErrorStatus;
-}
-
-SRV_enuErrorStatus_t MRCC_enuEnableAPB1PeripheralClk(uint32_t copy_uint32APB1Peripherals) // mask for all peripheral resets
-{
-    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-
-    if ((copy_uint32APB1Peripherals && RCC_APB1_PERIPHERAL_CLK_MASK) == true)
-    {
-        ret_enuErrorStatus = INV_ARG;
-    }
-    else /* arguments are valid */
-    {
-        /* setting prescalers into register */
-        RCC->APB1ENR = ((RCC->APB1ENR & RCC_APB1_PERIPHERAL_CLK_MASK) | copy_uint32APB1Peripherals);
-    }
-
-    return ret_enuErrorStatus;
-}
-
-SRV_enuErrorStatus_t MRCC_enuEnableAPB2PeripheralClk(uint32_t copy_uint32APB2Peripherals) // mask for all peripheral resets
-{
-    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-
-    if ((copy_uint32APB2Peripherals && RCC_APB2_PERIPHERAL_CLK_MASK) == true)
-    {
-        ret_enuErrorStatus = INV_ARG;
-    }
-    else /* arguments are valid */
-    {
-        /* setting prescalers into register */
-        RCC->APB2ENR = ((RCC->APB2ENR & RCC_APB2_PERIPHERAL_CLK_MASK) | copy_uint32APB2Peripherals);
-    }
-
-    return ret_enuErrorStatus;
-}
-
-SRV_enuErrorStatus_t MRCC_enuEnableAHB1PeripheralClkLowPower(uint32_t copy_uint32AHB1Peripherals) // mask for all peripheral resets
-{
-    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-
-    if ((copy_uint32AHB1Peripherals && RCC_AHB1_PERIPHERAL_CLK_MASK) == true)
-    {
-        ret_enuErrorStatus = INV_ARG;
-    }
-    else /* arguments are valid */
-    {
-        /* setting prescalers into register */
-        RCC->AHB1LPENR = ((RCC->AHB1LPENR & RCC_AHB1_PERIPHERAL_CLK_MASK) | copy_uint32AHB1Peripherals);
-    }
-
-    return ret_enuErrorStatus;
-}
-
-
-SRV_enuErrorStatus_t MRCC_enuEnableAHB2PeripheralClkLowPower(uint32_t copy_uint32AHB2Peripherals) // mask for all peripheral resets
-{
-    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-
-    if ((copy_uint32AHB2Peripherals && RCC_AHB2_PERIPHERAL_CLK_MASK) == true)
-    {
-        ret_enuErrorStatus = INV_ARG;
-    }
-    else /* arguments are valid */
-    {
-        /* setting prescalers into register */
-        RCC->AHB2LPENR = ((RCC->AHB2LPENR & RCC_AHB2_PERIPHERAL_CLK_MASK) | copy_uint32AHB2Peripherals);
-    }
-
-    return ret_enuErrorStatus;
-}
-
-SRV_enuErrorStatus_t MRCC_enuEnableAPB1PeripheralClkLowPower(uint32_t copy_uint32APB1Peripherals) // mask for all peripheral resets
-{
-    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-
-    if ((copy_uint32APB1Peripherals && RCC_APB1_PERIPHERAL_CLK_MASK) == true)
-    {
-        ret_enuErrorStatus = INV_ARG;
-    }
-    else /* arguments are valid */
-    {
-        /* setting prescalers into register */
-        RCC->APB1LPENR = ((RCC->APB1LPENR & RCC_APB1_PERIPHERAL_CLK_MASK) | copy_uint32APB1Peripherals);
-    }
-
-    return ret_enuErrorStatus;
-}
-
-SRV_enuErrorStatus_t MRCC_enuEnableAPB2PeripheralClkLowPower(uint32_t copy_uint32APB2Peripherals) // mask for all peripheral resets
-{
-    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-
-    if ((copy_uint32APB2Peripherals && RCC_APB2_PERIPHERAL_CLK_MASK) == true)
-    {
-        ret_enuErrorStatus = INV_ARG;
-    }
-    else /* arguments are valid */
-    {
-        /* setting prescalers into register */
-        RCC->APB2LPENR = ((RCC->APB2LPENR & RCC_APB2_PERIPHERAL_CLK_MASK) | copy_uint32APB2Peripherals);
-    }
-
-    return ret_enuErrorStatus;
-}
-
