@@ -1,5 +1,8 @@
-#include "RCC.h"
+#include "std_types.h"
+#include "error_status.h"
 #include "RCC_Reg.h"
+#include "RCC_PBCFG.h"
+#include "RCC.h"
 
 
 /*
@@ -36,11 +39,11 @@
 
 SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc(MRCC_enuSYSCLK_t copy_enuSysClkSrc)
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_enuSysClkSrc != MRCC_SYS_CLK_HSI) && (copy_enuSysClkSrc != MRCC_SYS_CLK_HSE) && (copy_enuSysClkSrc != MRCC_SYS_CLK_PLL))
     {
-        ret_enuErrStatus = RCC_INV_CLK_SRC;
+        ret_enuErrorStatus = RCC_INV_CLK_SRC;
     }
     else
     {
@@ -48,13 +51,13 @@ SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc(MRCC_enuSYSCLK_t copy_enuSysClkSrc)
         RCC->CFGR = ((RCC->CFGR & RCC_SYS_CLK_SET_MASK) | copy_enuSysClkSrc);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 
 SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc(uint32_t* ptr_uint32SysClkSrc)
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if (ptr_uint32UsedSysClk == NULL)
     {
@@ -67,22 +70,22 @@ SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc(uint32_t* ptr_uint32SysClkSrc)
         (*ptr_uint32UsedSysClk) = ((RCC->CFGR & ~RCC_SYS_CLK_GET_MASK) >> SYS_CLK_SRC_POS);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 /* this function takes the input inside the above macro */
 SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_enuPLLConfig_t copy_enuPLLConfig)
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
     uint16_t local_uint16WaitTimeout = MRCC_WAIT_TIMEOUT;
 
     if (IS_PLL_ENABLED())
     {
-        ret_enuErrStatus = RCC_PLL_CFG_WHILE_EN;
+        ret_enuErrorStatus = RCC_PLL_CFG_WHILE_EN;
     }
     else if ((copy_enuPLLConfig && RCC_PLL_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -101,7 +104,7 @@ SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_enuPLLConfig_t copy_enuPLLConfig)
         /* if exited due to timeout -> return error status */
         if (local_uint16WaitTimeout == 0)
         {
-            ret_enuErrStatus = RCC_TIMEOUT;
+            ret_enuErrorStatus = RCC_TIMEOUT;
         }
         else
         {
@@ -119,17 +122,20 @@ SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_enuPLLConfig_t copy_enuPLLConfig)
             /* if exited due to timeout -> return error status */
             if (local_uint16WaitTimeout == 0)
             {
-                ret_enuErrStatus = RCC_TIMEOUT;
+                ret_enuErrorStatus = RCC_TIMEOUT;
             }
             else {} /* exit function normally */
         }
     }
 
-    return ret_enuErrStatus;    
+    return ret_enuErrorStatus;    
 }
 
 
+SRV_enuErrorStatus_t MRCC_enuSetPeripheralBusesPrescaler(MRCC_enuPeriphBusPresConfig_t copy_enuBusPrescalers)
+{
 
+}
 
 
 
@@ -168,11 +174,11 @@ SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_enuPLLConfig_t copy_enuPLLConfig)
 
 SRV_enuErrorStatus_t MRCC_enuConfigBusPrescaler(uint32_t copy_uint32BusPrescalers) // prescaler for APB1/2 && AHB1/2 (ignore the one for USBOTG)
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_uint32BusPrescalers && RCC_BUS_PRESCALER_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -180,7 +186,7 @@ SRV_enuErrorStatus_t MRCC_enuConfigBusPrescaler(uint32_t copy_uint32BusPrescaler
         RCC->PLLCFGR_R = ((RCC->PLLCFGR_R & RCC_BUS_PRESCALER_MASK) | copy_uint32BusPrescalers);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 #define COLLECT_AHB1_PERPHERALS(GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOH, CRC, DMA1, DMA2)    \
@@ -188,11 +194,11 @@ SRV_enuErrorStatus_t MRCC_enuConfigBusPrescaler(uint32_t copy_uint32BusPrescaler
 
 SRV_enuErrorStatus_t MRCC_enuResetAHB1PeripheralClk(uint32_t copy_uint32AHB1Peripherals) // mask for all peripheral resets
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_uint32AHB1Peripherals && RCC_AHB1_PERIPHERAL_CLK_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -200,7 +206,7 @@ SRV_enuErrorStatus_t MRCC_enuResetAHB1PeripheralClk(uint32_t copy_uint32AHB1Peri
         RCC->AHB1RSTR = ((RCC->AHB1RSTR & RCC_AHB1_PERIPHERAL_CLK_MASK) | copy_uint32AHB1Peripherals);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 #define COLLECT_AHB2_PERPHERALS(USBOTG)    \
@@ -208,11 +214,11 @@ SRV_enuErrorStatus_t MRCC_enuResetAHB1PeripheralClk(uint32_t copy_uint32AHB1Peri
 
 SRV_enuErrorStatus_t MRCC_enuResetAHB2PeripheralClk(uint32_t copy_uint32AHB2Peripherals) // mask for all peripheral resets
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_uint32AHB2Peripherals && RCC_AHB2_PERIPHERAL_CLK_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -220,7 +226,7 @@ SRV_enuErrorStatus_t MRCC_enuResetAHB2PeripheralClk(uint32_t copy_uint32AHB2Peri
         RCC->AHB2RSTR = ((RCC->AHB2RSTR & RCC_AHB2_PERIPHERAL_CLK_MASK) | copy_uint32AHB2Peripherals);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 #define COLLECT_APB1_PERPHERALS(TIM2RST, TIM3RST, TIM4RST, TIM5RST, WWDGRST, SPI2RST, SPI3RST, USART2RST, I2C1RST, IC2RST, I2C3RST, PWRRST)    \
@@ -228,11 +234,11 @@ SRV_enuErrorStatus_t MRCC_enuResetAHB2PeripheralClk(uint32_t copy_uint32AHB2Peri
 
 SRV_enuErrorStatus_t MRCC_enuResetAPB1PeripheralClk(uint32_t copy_uint32APB1Peripherals) // mask for all peripheral resets
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_uint32APB1Peripherals && RCC_APB1_PERIPHERAL_CLK_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -240,7 +246,7 @@ SRV_enuErrorStatus_t MRCC_enuResetAPB1PeripheralClk(uint32_t copy_uint32APB1Peri
         RCC->APB1RSTR = ((RCC->APB1RSTR & RCC_APB1_PERIPHERAL_CLK_MASK) | copy_uint32APB1Peripherals);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 #define COLLECT_APB2_PERPHERALS(TIM1RST, USART1RST, USART6RST, ADC1RST, SDIORST, SPI1RST, SPI4RST, SYSCFGRST, TIM9RST, TIM10RST, TIM11RST)    \
@@ -248,11 +254,11 @@ SRV_enuErrorStatus_t MRCC_enuResetAPB1PeripheralClk(uint32_t copy_uint32APB1Peri
 
 SRV_enuErrorStatus_t MRCC_enuResetAPB2PeripheralClk(uint32_t copy_uint32APB2Peripherals) // mask for all peripheral resets
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_uint32APB2Peripherals && RCC_APB2_PERIPHERAL_CLK_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -260,17 +266,17 @@ SRV_enuErrorStatus_t MRCC_enuResetAPB2PeripheralClk(uint32_t copy_uint32APB2Peri
         RCC->APB2RSTR = ((RCC->APB2RSTR & RCC_APB2_PERIPHERAL_CLK_MASK) | copy_uint32APB2Peripherals);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 
 SRV_enuErrorStatus_t MRCC_enuEnableAHB1PeripheralClk(uint32_t copy_uint32AHB1Peripherals) // mask for all peripheral resets
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_uint32AHB1Peripherals && RCC_AHB1_PERIPHERAL_CLK_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -278,17 +284,17 @@ SRV_enuErrorStatus_t MRCC_enuEnableAHB1PeripheralClk(uint32_t copy_uint32AHB1Per
         RCC->AHB1ENR = ((RCC->AHB1ENR & RCC_AHB1_PERIPHERAL_CLK_MASK) | copy_uint32AHB1Peripherals);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 
 SRV_enuErrorStatus_t MRCC_enuEnableAHB2PeripheralClk(uint32_t copy_uint32AHB2Peripherals) // mask for all peripheral resets
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_uint32AHB2Peripherals && RCC_AHB2_PERIPHERAL_CLK_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -296,16 +302,16 @@ SRV_enuErrorStatus_t MRCC_enuEnableAHB2PeripheralClk(uint32_t copy_uint32AHB2Per
         RCC->AHB2ENR = ((RCC->AHB2ENR & RCC_AHB2_PERIPHERAL_CLK_MASK) | copy_uint32AHB2Peripherals);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 SRV_enuErrorStatus_t MRCC_enuEnableAPB1PeripheralClk(uint32_t copy_uint32APB1Peripherals) // mask for all peripheral resets
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_uint32APB1Peripherals && RCC_APB1_PERIPHERAL_CLK_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -313,16 +319,16 @@ SRV_enuErrorStatus_t MRCC_enuEnableAPB1PeripheralClk(uint32_t copy_uint32APB1Per
         RCC->APB1ENR = ((RCC->APB1ENR & RCC_APB1_PERIPHERAL_CLK_MASK) | copy_uint32APB1Peripherals);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 SRV_enuErrorStatus_t MRCC_enuEnableAPB2PeripheralClk(uint32_t copy_uint32APB2Peripherals) // mask for all peripheral resets
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_uint32APB2Peripherals && RCC_APB2_PERIPHERAL_CLK_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -330,16 +336,16 @@ SRV_enuErrorStatus_t MRCC_enuEnableAPB2PeripheralClk(uint32_t copy_uint32APB2Per
         RCC->APB2ENR = ((RCC->APB2ENR & RCC_APB2_PERIPHERAL_CLK_MASK) | copy_uint32APB2Peripherals);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 SRV_enuErrorStatus_t MRCC_enuEnableAHB1PeripheralClkLowPower(uint32_t copy_uint32AHB1Peripherals) // mask for all peripheral resets
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_uint32AHB1Peripherals && RCC_AHB1_PERIPHERAL_CLK_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -347,17 +353,17 @@ SRV_enuErrorStatus_t MRCC_enuEnableAHB1PeripheralClkLowPower(uint32_t copy_uint3
         RCC->AHB1LPENR = ((RCC->AHB1LPENR & RCC_AHB1_PERIPHERAL_CLK_MASK) | copy_uint32AHB1Peripherals);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 
 SRV_enuErrorStatus_t MRCC_enuEnableAHB2PeripheralClkLowPower(uint32_t copy_uint32AHB2Peripherals) // mask for all peripheral resets
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_uint32AHB2Peripherals && RCC_AHB2_PERIPHERAL_CLK_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -365,16 +371,16 @@ SRV_enuErrorStatus_t MRCC_enuEnableAHB2PeripheralClkLowPower(uint32_t copy_uint3
         RCC->AHB2LPENR = ((RCC->AHB2LPENR & RCC_AHB2_PERIPHERAL_CLK_MASK) | copy_uint32AHB2Peripherals);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 SRV_enuErrorStatus_t MRCC_enuEnableAPB1PeripheralClkLowPower(uint32_t copy_uint32APB1Peripherals) // mask for all peripheral resets
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_uint32APB1Peripherals && RCC_APB1_PERIPHERAL_CLK_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -382,16 +388,16 @@ SRV_enuErrorStatus_t MRCC_enuEnableAPB1PeripheralClkLowPower(uint32_t copy_uint3
         RCC->APB1LPENR = ((RCC->APB1LPENR & RCC_APB1_PERIPHERAL_CLK_MASK) | copy_uint32APB1Peripherals);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 
 SRV_enuErrorStatus_t MRCC_enuEnableAPB2PeripheralClkLowPower(uint32_t copy_uint32APB2Peripherals) // mask for all peripheral resets
 {
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
 
     if ((copy_uint32APB2Peripherals && RCC_APB2_PERIPHERAL_CLK_MASK) == true)
     {
-        ret_enuErrStatus = INV_ARG;
+        ret_enuErrorStatus = INV_ARG;
     }
     else /* arguments are valid */
     {
@@ -399,6 +405,6 @@ SRV_enuErrorStatus_t MRCC_enuEnableAPB2PeripheralClkLowPower(uint32_t copy_uint3
         RCC->APB2LPENR = ((RCC->APB2LPENR & RCC_APB2_PERIPHERAL_CLK_MASK) | copy_uint32APB2Peripherals);
     }
 
-    return ret_enuErrStatus;
+    return ret_enuErrorStatus;
 }
 

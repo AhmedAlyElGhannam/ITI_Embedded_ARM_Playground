@@ -1,161 +1,6 @@
 #ifndef RCC_H
 #define RCC_H
 
-/* 
-    CR -> check for ready status && turn on the following
-        1. PLL
-        1. I2S PLL
-        1. CSS (on only)
-        1. HSE
-        1. HSI
-    also, it has values for trimming HSI clock -> HSITRIM
- */
-
-/* 
-    PLLCFGR -> give it the values of M, N, P, Q
-
- */
-
-/*
-    CFGR -> to set clock source and prescaler of:
-            MCO1 && MCO2
-         -> to set the prescaler of:
-            AHB && APB
-         -> clock selection of I2S
-         -> select system clock && read the selected system clock ###
-*/
-
-/*
-    CIR -> contain InterruptFlagClear, InterruptFlagStatus, and InterruptEnable for the following:
-            CSS, PLL, PLLI2S, HSE, HSI, LSE, LSI
-*/
-
-/*
-    AHB1RSTR -> resets the peripheral clock for the ones connected on AHB1 bus:
-                DMA2, DMA1, CRC, GPIOA-H, 
-*/
-
-/*
-    AHB2RSTR -> resets the peripheral clock for the ones connected on AHB2 bus:
-                 USBOTG
-*/  
-
-/*
-    APB1RSTR -> resets the peripheral clock for the ones connected on APB1 bus:
-                 PowerInterfaceReset, I2C3, I2C2, I2C1, USART2, SPI3, SPI2, WindowWDG, TIM5-TIM2
-*/ 
-
-/*
-    APB2RSTR -> resets the peripheral clock for the ones connected on APB2 bus:
-                TIM11-TIM9, SystemConfigurationController, SPI4, SPI1, SDIO, ADC1, USART6, USART1, TIM1
-*/ 
-
-/*
-    AHB1ENR -> enables clock for peripherals connected on AHB1:
-                DMA2, DMA1, CRC, GPIOA-H,
-*/
-
-/*
-    AHB2ENR -> enables clock for peripherals connected on AHB2:
-                USBOTG
-*/
-
-/*
-    APB1ENR -> enables clock for peripherals connected on APB1 bus:
-                 PowerInterfaceReset, I2C3, I2C2, I2C1, USART2, SPI3, SPI2, WindowWDG, TIM5-TIM2
-*/ 
-
-/*
-    APB2ENR -> enables clock for peripherals connected on APB2 bus:
-                TIM11-TIM9, SystemConfigurationController, SPI4, SPI1, SDIO, ADC1, USART6, USART1, TIM1
-*/ 
-
-/*
-    BDCR -> resets backup domain, enables RTC clock, select RTC clock source
-         -> External Low-speed Oscillator Ready, ByPass, Enable
-*/
-
-/*
-    CSR -> bit 31-24 are reset flags,
-        -> Internal Low-speed Oscillator Ready, Enable
-*/
-
-/*
-    SSCGR -> for spread spectrum (out of scope -- concerned with PLL performance)
-*/
-
-/*
-    PLLI2SCFGR -> values for N && R in PLLI2S
-*/
-
-/*
-    DCKCFGR -> sets prescaler for timers
-*/
-
-
-
-/*
-    TODO:
-        1. make functions to get the status of flags (make it return the value in a ptr and ALWAYS make the return value an error status)
-        1. make a function for enabling interrupts that takes multiple ORed masks 
-*/
-
-
-/*
-    ### for waiting
-    when waiting for a flag, ALWAYS add a timeout condition
-    DO NOT DO: while (RCC->CFGR & HSI_READY);
-    DO: while ((RCC->CFGR & HSI_READY) && (timeout--));
-
-    make a timeout error status after that:
-    if (timeout == 0 && HSI_NOT_READY)
-        status = timeout;
-*/
-
-
-/*
-    use anonymous unions and bitfields for PLL configurations
-
-    typedef struct
-    {
-        union
-        {
-            struct
-            {
-                M : 6
-                N : 4
-                .
-                .
-            } cfg_t;
-
-            uint32_t reg;
-        }
-    }
-*/
-
-/*
-    __attribute__((packed))
-
-    #pragme pack(1) // to force compiler to not pack stuff
-*/
-
-/*
-    Feature in PlatformIO:
-        Project Inspect -> gives info about memory usage + static analysis for code
-*/
-#include "RCC_PBCFG.h"
-
-typedef enum
-{
-    ALL_OK = 0x00,
-    NOK,
-    NULL_PTR,
-    INV_ARG,
-    RCC_TIMEOUT,
-    RCC_INV_CLK_SRC,
-    RCC_PLL_CFG_WHILE_EN,
-} SRV_enuErrorStatus_t;
-
 typedef enum
 {
     PLL_CLK_READY = 0x2000000ULL,
@@ -508,6 +353,7 @@ typedef enum
 SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc(MRCC_enuSYSCLK_t copy_enuSysClkSrc);
 SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc(uint32_t* ptr_uint32SysClkSrc);
 SRV_enuErrorStatus_t MRCC_enuSetPLLConfig(MRCC_enuPLLConfig_t copy_enuPLLConfig);
+SRV_enuErrorStatus_t MRCC_enuSetPeripheralBusesPrescaler(MRCC_enuPeriphBusPresConfig_t copy_enuBusPrescalers);
 
 /* POSTPONED FOR NOW
 SRV_enuErrorStatus_t MRCC_enuSetCSSConfig(); 
@@ -516,12 +362,8 @@ SRV_enuErrorStatus_t MRCC_enuSetMCOConfig();
 SRV_enuErrorStatus_t MRCC_enuSetRTCConfig(); 
 SRV_enuErrorStatus_t MRCC_enuSetPLLSpreadSpectrumConfig(); 
 SRV_enuErrorStatus_t MRCC_enuSetTimerPrescaler();
-*/
-
-SRV_enuErrorStatus_t MRCC_enuSetPeripheralBusesPrescaler(MRCC_enuPeriphBusPresConfig_t copy_enuBusPrescalers);
-
-
 SRV_enuErrorStatus_t MRCC_enuClrAllClkIntFlags(MRCC_enuClrIntRdyFlags_t copy_enuIntFlags); 
+*/
 
 
 #define MRCC_CLR_RST_FLAGS()    
@@ -582,6 +424,9 @@ SRV_enuErrorStatus_t MRCC_enuClrAllClkIntFlags(MRCC_enuClrIntRdyFlags_t copy_enu
 #define MRCC_DISABLE_HSI_INT()
 #define MRCC_DISABLE_LSE_INT()
 #define MRCC_DISABLE_LSI_INT()
+
+#define MRCC_DISABLE_ALL_INT()
+#define MRCC_ENABLE_ALL_INT()
 
 
 
