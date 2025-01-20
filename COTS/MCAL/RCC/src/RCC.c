@@ -11,9 +11,15 @@
          -> select system clock && read the selected system clock ###
 */
 
+
+#define MRCC_WAIT_TIMEOUT   1000
+
+
 /* MASKS (Should not be visible/accessible to user) */
-#define RCC_SYS_CLK_SET_MASK                (0xFFFFFFFCULL)
-#define RCC_SYS_CLK_GET_MASK                (0xFFFFFFF3ULL)
+#define RCC_SYS_CLK_SET_MASK                (0xFFFFFFFCUL)
+#define RCC_SYS_CLK_GET_MASK                (0xFFFFFFF3UL)
+
+
 #define RCC_PLL_CLK_READY_MASK              (0xFDFFFFFFULL)
 #define RCC_PLLI2S_CLK_READY_MASK           (0xF7FFFFFFULL)
 #define RCC_HSE_CLK_READY_MASK              (0xFFFDFFFFULL)
@@ -28,7 +34,7 @@
 #define RCC_APB2_PERIPHERAL_CLK_MASK        (0xFFF886CEULL)
 
 
-SRV_enuErrorStatus_t MRCC_enuSelectSysClkSource(MRCC_enuSYSCLK_t copy_enuSysClkSrc)
+SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc(MRCC_enuSYSCLK_t copy_enuSysClkSrc)
 {
     SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
 
@@ -39,19 +45,20 @@ SRV_enuErrorStatus_t MRCC_enuSelectSysClkSource(MRCC_enuSYSCLK_t copy_enuSysClkS
     else
     {
         /* set sys clk source */
-        RCC->CFGR = (RCC->CFGR & RCC_SYS_CLK_SET_MASK) | copy_enuSysClkSrc;
+        RCC->CFGR = ((RCC->CFGR & RCC_SYS_CLK_SET_MASK) | copy_enuSysClkSrc);
     }
 
     return ret_enuErrStatus;
 }
 
-SRV_enuErrorStatus_t MRCC_enuCheckSysClkSource(uint32_t* ptr_uint32UsedSysClk)
+
+SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc(uint32_t* ptr_uint32SysClkSrc)
 {
     SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
 
     if (ptr_uint32UsedSysClk == NULL)
     {
-        ret_enuErrStatus = NULL_PTR;
+        ptr_uint32SysClkSrc = NULL_PTR;
     }
     else
     {
@@ -63,100 +70,11 @@ SRV_enuErrorStatus_t MRCC_enuCheckSysClkSource(uint32_t* ptr_uint32UsedSysClk)
     return ret_enuErrStatus;
 }
 
-SRV_enuErrorStatus_t MRCC_enuCheckPLLClkReadyStatus(uint32_t* ptr_uint32PLLClkStatus)
-{
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
-
-    if (ptr_uint32PLLClkStatus == NULL)
-    {
-        ret_enuErrStatus = NULL_PTR;
-    }
-    else
-    {
-        #define PLL_CLK_READY_POS   (25) 
-
-        (*ptr_uint32PLLClkStatus) = ((RCC->CR & ~RCC_PLL_CLK_READY_MASK) >> PLL_CLK_READY_POS);
-    }
-
-    return ret_enuErrStatus;
-}
-
-
-SRV_enuErrorStatus_t MRCC_enuCheckPLLI2SClkReadyStatus(uint32_t* ptr_uint32PLLI2SClkStatus)
-{
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
-
-    if (ptr_uint32PLLI2SClkStatus == NULL)
-    {
-        ret_enuErrStatus = NULL_PTR;
-    }
-    else
-    {
-        #define PLLI2S_CLK_READY_POS   (27) 
-
-        (*ptr_uint32PLLI2SClkStatus) = ((RCC->CR & ~RCC_PLLI2S_CLK_READY_MASK) >> PLLI2S_CLK_READY_POS);
-    }
-
-    return ret_enuErrStatus;
-}
-
-SRV_enuErrorStatus_t MRCC_enuCheckHSEReadyStatus(uint32_t* ptr_uint32HSEClkStatus)
-{
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
-
-    if (ptr_uint32HSEClkStatus == NULL)
-    {
-        ret_enuErrStatus = NULL_PTR;
-    }
-    else
-    {
-        #define HSE_CLK_READY_POS   (17)
-
-        (*ptr_uint32HSEClkStatus) = ((RCC->CR & ~RCC_HSE_CLK_READY_MASK) >> HSE_CLK_READY_POS);
-    }
-
-    return ret_enuErrStatus;
-}
-
-SRV_enuErrorStatus_t MRCC_enuCheckHSIReadyStatus(uint32_t* ptr_uint32HSIClkStatus)
-{
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
-
-    if (ptr_uint32HSIClkStatus == NULL)
-    {
-        ret_enuErrStatus = NULL_PTR;
-    }
-    else
-    {
-        #define HSI_CLK_READY_POS   (1)
-
-        (*ptr_uint32HSIClkStatus) = ((RCC->CR & ~RCC_HSI_CLK_READY_MASK) >> HSI_CLK_READY_POS);
-    }
-
-    return ret_enuErrStatus;
-}
-
-SRV_enuErrorStatus_t MRCC_enuConfigCSS(SRV_enuConfig_t copy_enuCSSConfig)
-{
-    SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
-
-    if ((copy_enuCSSConfig != CSS_ENABLE) && (copy_enuCSSConfig != CSS_DISABLE))
-    {
-        ret_enuErrStatus = INV_ARG;
-    }
-    else
-    {
-        RCC->CR = (RCC->CR & RCC_CSS_EN_MASK) | copy_enuCSSConfig;
-    }
-
-    return ret_enuErrStatus;
-}
-
-// #define COLLECT_PLL_CONFIGS(M, N, P, Q, PLL_SRC)    ((uint32_t)(((Q) << 24) | ((PLL_SRC) << 22) | ((P) << 16) | ((N) << 6) | ((M) << 0)))
 /* this function takes the input inside the above macro */
 SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_enuPLLConfig_t copy_enuPLLConfig)
 {
     SRV_enuErrorStatus_t ret_enuErrStatus = ALL_OK;
+    uint16_t local_uint16WaitTimeout = MRCC_WAIT_TIMEOUT;
 
     if (IS_PLL_ENABLED())
     {
@@ -168,30 +86,72 @@ SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_enuPLLConfig_t copy_enuPLLConfig)
     }
     else /* arguments are valid */
     {
-        if ((copy_enuPLLConfig & (1 << 22)) == 0) /* HSI */
+        if (((copy_enuPLLConfig >> 22) & (1U)) == 0) /* HSI */
         {
             /* check if it is ready + timeout */
-            while (STATUS && TIMEOUT--);
-
-            /* if exited due to timeout -> send error status */
+            while (MRCC_IS_HSI_READY() && local_uint16WaitTimeout--);
         }
-        else if ((copy_enuPLLConfig & (1 << 22)) == 1) /* HSE */
+        else if (((copy_enuPLLConfig >> 22) & (1U)) == 1) /* HSE */
         {
             /* check if it is ready + timeout */
-            while (STATUS && TIMEOUT--);
-
-            /* if exited due to timeout -> send error status */
+            while (MRCC_IS_HSE_READY() && local_uint16WaitTimeout--);
         }
+        else {}
 
-        /* setting prescalers into register */
-        RCC->PLLCFGR_R = ((RCC->PLLCFGR_R & RCC_PLL_MASK) | copy_enuPLLConfig);
+        /* if exited due to timeout -> return error status */
+        if (local_uint16WaitTimeout == 0)
+        {
+            ret_enuErrStatus = RCC_TIMEOUT;
+        }
+        else
+        {
+            /* setting prescalers into register */
+            RCC->PLLCFGR_R = ((RCC->PLLCFGR_R & RCC_PLL_MASK) | copy_enuPLLConfig);
 
-        /* enable PLL */
-        RCC->CR = (RCC->CR & RCC_PLL_EN_MASK) | (1 << 24);
+            /* enable PLL */
+            MRCC_PLL_ENABLE();
+            /*RCC->CR = (RCC->CR & RCC_PLL_EN_MASK) | (1 << 24);*/
+
+            /* wait until PLL is ready */
+            local_uint16WaitTimeout = MRCC_WAIT_TIMEOUT;
+            while (MRCC_IS_PLL_READY() && local_uint16WaitTimeout--);
+
+            /* if exited due to timeout -> return error status */
+            if (local_uint16WaitTimeout == 0)
+            {
+                ret_enuErrStatus = RCC_TIMEOUT;
+            }
+            else {} /* exit function normally */
+        }
     }
 
     return ret_enuErrStatus;    
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ((RCC->CR & ~RCC_PLL_CLK_READY_MASK) >> PLL_CLK_READY_POS);
+// ((RCC->CR & ~RCC_PLLI2S_CLK_READY_MASK) >> PLLI2S_CLK_READY_POS);
+// ((RCC->CR & ~RCC_HSE_CLK_READY_MASK) >> HSE_CLK_READY_POS);
+// ((RCC->CR & ~RCC_HSI_CLK_READY_MASK) >> HSI_CLK_READY_POS);
+// (RCC->CR & RCC_CSS_EN_MASK) | copy_enuCSSConfig;
+
+
+
+
+// #define COLLECT_PLL_CONFIGS(M, N, P, Q, PLL_SRC)    ((uint32_t)(((Q) << 24) | ((PLL_SRC) << 22) | ((P) << 16) | ((N) << 6) | ((M) << 0)))
+
 
 // #define COLLECT_PLLI2S_CONFIGS(R, N, PLLI2S_SRC)    ((uint32_t)(((R) << 28) | ((PLL_SRC) << 22) | ((P) << 16) | ((N) << 6) | ((M) < 0)))
 
@@ -442,40 +402,3 @@ SRV_enuErrorStatus_t MRCC_enuEnableAPB2PeripheralClkLowPower(uint32_t copy_uint3
     return ret_enuErrStatus;
 }
 
-SRV_enuErrorStatus_t MRCC_enuClrClkInterruptFlag(); // mask for all flags that has to be cleared
-
-
-SRV_enuErrorStatus_t MRCC_enuEnableCSSInterrupt();
-SRV_enuErrorStatus_t MRCC_enuEnablePLLInterrupt();
-SRV_enuErrorStatus_t MRCC_enuEnablePLLI2SInterrupt();
-SRV_enuErrorStatus_t MRCC_enuEnableHSEInterrupt();
-SRV_enuErrorStatus_t MRCC_enuEnableHSIInterrupt();
-SRV_enuErrorStatus_t MRCC_enuEnableLSEInterrupt();
-SRV_enuErrorStatus_t MRCC_enuEnableLSIInterrupt();
-
-SRV_enuErrorStatus_t MRCC_enuCheckCSSInterruptFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckPLLInterruptFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckPLLI2SInterruptFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckHSEInterruptFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckHSIInterruptFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckLSEInterruptFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckLSIInterruptFlagStatus();
-
-SRV_enuErrorStatus_t MRCC_enuConfigRTC();
-
-SRV_enuErrorStatus_t MRCC_enuEnableLSI();
-SRV_enuErrorStatus_t MRCC_enuCheckLSIReadyStatus();
-
-SRV_enuErrorStatus_t MRCC_enuEnableLSE();
-SRV_enuErrorStatus_t MRCC_enuCheckLSEReadyStatus();
-
-SRV_enuErrorStatus_t MRCC_enuConfigurePLLSpreadSpectrum();
-
-SRV_enuErrorStatus_t MRCC_enuClrResetFlags();
-
-SRV_enuErrorStatus_t MRCC_enuCheckLPWRResetFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckWWDGResetFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckIWDGResetFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckPORResetFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckPINResetFlagStatus();
-SRV_enuErrorStatus_t MRCC_enuCheckBORResetFlagStatus();

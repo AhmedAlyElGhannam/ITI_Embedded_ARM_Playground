@@ -193,15 +193,47 @@ typedef unsigned long int uint32_t;
 
 typedef enum 
 {
-    PLL_M   = (MRCC_PLL_M_PRESCALER << 0)  & (0x0000003FULL),
-    PLL_N   = (MRCC_PLL_N_PRESCALER << 6)  & (0x00007FC0ULL),
-    PLL_P   = (MRCC_PLL_P_PRESCALER << 16) & (0x00030000ULL),
-    PLL_Q   = (MRCC_PLL_Q_PRESCALER << 24) & (0x0F000000ULL),
-    PLL_SRC = (MRCC_PLL_SRC << 22)         & (0x00400000ULL),
+    PLL_M   = (MRCC_PLL_M_PRESCALER << 0)  & (0x0000003FUL),
+    PLL_N   = (MRCC_PLL_N_PRESCALER << 6)  & (0x00007FC0UL),
+    PLL_P   = (MRCC_PLL_P_PRESCALER << 16) & (0x00030000UL),
+    PLL_Q   = (MRCC_PLL_Q_PRESCALER << 24) & (0x0F000000UL),
+    PLL_SRC = (MRCC_PLL_SRC << 22)         & (0x00400000UL),
     PLL_COMBINED_PRE = (PLL_M | PLL_N | PLL_P | PLL_Q | PLL_SRC),  /* use this value in PLL_config function */
 } MRCC_enuPLLConfig_t;
 
+#define MRCC_APB_DIV_BY_2       (0b100UL)       
+#define MRCC_APB_DIV_BY_4       (0b101UL)
+#define MRCC_APB_DIV_BY_8       (0b110UL)
+#define MRCC_APB_DIV_BY_16      (0b111UL)
 
+#define MRCC_AHB_DIV_BY_2           (0b1000UL)
+#define MRCC_AHB_DIV_BY_4           (0b1001UL)
+#define MRCC_AHB_DIV_BY_8           (0b1010UL)
+#define MRCC_AHB_DIV_BY_16          (0b1011UL)
+#define MRCC_AHB_DIV_BY_64          (0b1100UL)
+#define MRCC_AHB_DIV_BY_128         (0b1101UL)
+#define MRCC_AHB_DIV_BY_256         (0b1110UL)
+#define MRCC_AHB_DIV_BY_512         (0b1111UL)
+
+
+typedef enum 
+{
+    AHB1_PRE = (MRCC_AHB_DIV_BY_2 << 4) & (0xF0UL),
+    APB1_PRE = (MRCC_APB_DIV_BY_4 << 10) & (0x1C00UL),
+    APB2_PRE = (MRCC_APB_DIV_BY_4 << 13) & (0xE000UL),
+    PERIPH_COMBINED_PRE = (AHB1_PRE | APB1_PRE | APB2_PRE),  /* use this value in bus prescaler function */
+} MRCC_enuPeriphBusPresConfig_t;
+
+typedef enum
+{
+    CSSC = (1U << 23),
+    PLLI2S_RDYC = (1U << 21),
+    PLL_RDYC = (1U << 20),
+    HSE_RDYC = (1U << 19),
+    HSI_RDYC = (1U << 18),
+    LSE_RDYC = (1U << 17),
+    LSI_RDYC = (1U << 16),
+} MRCC_enuClrIntRdyFlags_t;
 
 #define MRCC_AHB1_GPIOA_POS     (0UL)
 #define MRCC_AHB1_GPIOA_MSK     (0x1UL << MRCC_AHB1_GPIOA_POS)
@@ -473,24 +505,26 @@ typedef enum
 /***/
 
 
+SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc(MRCC_enuSYSCLK_t copy_enuSysClkSrc);
+SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc(uint32_t* ptr_uint32SysClkSrc);
 SRV_enuErrorStatus_t MRCC_enuSetPLLConfig(MRCC_enuPLLConfig_t copy_enuPLLConfig);
-SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc();
-SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc();
-SRV_enuErrorStatus_t MRCC_enuSetCSSConfig();
-SRV_enuErrorStatus_t MRCC_enuSetPLLI2SConfig();
-SRV_enuErrorStatus_t MRCC_enuSetMCOConfig();
-SRV_enuErrorStatus_t MRCC_enuSetRTCConfig();
-SRV_enuErrorStatus_t MRCC_enuSetPLLSpreadSpectrumConfig();
 
-
-SRV_enuErrorStatus_t MRCC_enuSetPeripheralBusesPrescaler();
+/* POSTPONED FOR NOW
+SRV_enuErrorStatus_t MRCC_enuSetCSSConfig(); 
+SRV_enuErrorStatus_t MRCC_enuSetPLLI2SConfig(); 
+SRV_enuErrorStatus_t MRCC_enuSetMCOConfig(); 
+SRV_enuErrorStatus_t MRCC_enuSetRTCConfig(); 
+SRV_enuErrorStatus_t MRCC_enuSetPLLSpreadSpectrumConfig(); 
 SRV_enuErrorStatus_t MRCC_enuSetTimerPrescaler();
+*/
 
-SRV_enuErrorStatus_t MRCC_enuClrAllClkRstFlags();
-SRV_enuErrorStatus_t MRCC_enuClrAllClkIntFlags(); 
+SRV_enuErrorStatus_t MRCC_enuSetPeripheralBusesPrescaler(MRCC_enuPeriphBusPresConfig_t copy_enuBusPrescalers);
 
 
+SRV_enuErrorStatus_t MRCC_enuClrAllClkIntFlags(MRCC_enuClrIntRdyFlags_t copy_enuIntFlags); 
 
+
+#define MRCC_CLR_RST_FLAGS()    
 
 #define MRCC_IS_LSE_READY()
 #define MRCC_IS_LSI_READY()
@@ -498,6 +532,20 @@ SRV_enuErrorStatus_t MRCC_enuClrAllClkIntFlags();
 #define MRCC_IS_PLLI2S_READY()
 #define MRCC_IS_HSE_READY()
 #define MRCC_IS_HSI_READY()
+
+#define MRCC_LSE_ENABLE()
+#define MRCC_LSI_ENABLE()
+#define MRCC_PLL_ENABLE()
+#define MRCC_PLLI2S_ENABLE()
+#define MRCC_HSE_ENABLE()
+#define MRCC_HSI_ENABLE()
+
+#define MRCC_LSE_DISABLE()
+#define MRCC_LSI_DISABLE()
+#define MRCC_PLL_DISABLE()
+#define MRCC_PLLI2S_DISABLE()
+#define MRCC_HSE_DISABLE()
+#define MRCC_HSI_DISABLE()
 
 #define MRCC_LSE_BYPASS()
 
