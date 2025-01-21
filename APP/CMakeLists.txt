@@ -10,27 +10,39 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 # set C && Cpp versions
 set(CMAKE_C_STANDARD 99)
 
-# project name + defining used languages 
-project(ARM_PROJECT C CPP ASM)
+# define a variable to store linker script name and path for this project
+set(${PROJECT_NAME}_LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/linker.ld)
 
-# include ,cmake script for converting .elf to .hex and flashing
-include(${CMAKE_CURRENT_SOURCE_DIR}/../COTS/convert-to-hex-plus-flash.cmake)
+# define a variable to store startup file name and path for this project
+set(${PROJECT_NAME}_STARTUP ${CMAKE_CURRENT_SOURCE_DIR}/startup/startup.c)
+
+# project name 
+project(ARM_PROJECT)
+
+# define used languages
+enable_language(C CXX ASM)
+
+# include .cmake script that contains used toolchain info
+include(${CMAKE_CURRENT_SOURCE_DIR}/../TOOLCHAIN/gcc-arm-none-eabi.cmake)
+
+# include .cmake script that contains flashing tool info
+include(${CMAKE_CURRENT_SOURCE_DIR}/../FLASH_TOOL/st-flash.cmake)
+
+# include ,cmake script for converting .elf to .hex/.bin and flashing
+include(${CMAKE_CURRENT_SOURCE_DIR}/../FLASH_SCRIPT/convert-to-hex-plus-flash.cmake)
 
 # arm mcu is cortex-m4 clocked @84MHz
 set(MCU cortex-m4)
-set(F_CPU 84000000) 
-set(COMPILE_MCU_NAME atmega32) 	# for compiler
-set(FLASH_MCU_NAME m32)    	# for avrdude
-#set(FCPU 16000000UL)	# for frequency
+set(F_CPU 84000000UL) 
 
 # programmer type 
-set(PROGRAMMER usbasp) 
+set(PROGRAMMER st-link) 
 
-# setting avrdude flash flags
-set(FLASH_FLAGS "-R .eeprom -R .lock -R .signature")
-
-# collect all .c files
+# collect all .c files for app
 file(GLOB_RECURSE ${PROJECT_NAME}_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
+
+# define app include dir
+set(${PROJECT_NAME}_INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/inc/")
 
 # defining a list of MCAL libraries that will be used to build HAL libraries
 set(MCAL_LIB
@@ -61,161 +73,58 @@ endforeach()
 # 	)
 # endforeach()
 
-# setting default compiler for C in this CMake file
-set(CMAKE_C_COMPILER "/usr/bin/arm-none-eabi-gcc")
-
-# setting defaulty compiler for Cpp in this CMake file
-set(CMAKE_C_COMPILER "/usr/bin/arm-none-eabi-g++")
-
-# setting defaulty assembler in this CMake file
-set(CMAKE_C_COMPILER "/usr/bin/arm-none-eabi-as")
-
-# setting default ar (lib archiving) tool in this CMake file
-set(CMAKE_C_COMPILER "/usr/bin/arm-none-eabi-ar")
-
-# setting default linker in this CMake file
-set(CMAKE_C_COMPILER "/usr/bin/arm-none-eabi-ld")
-
-# setting compiler flags for C && Cpp
-add_compile_options(
-    -Wall 
-    -Os 
-    -g 
-    -mmcu=${COMPILE_MCU_NAME}
-    )
-
-    # -Wall -Wextra -g -ffunction-sections -fdata-sections
-    # -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard
-    # set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/stm32f401cc.ld")
-    # startup file
-    # set(CMAKE_EXE_LINKER_FLAGS "-T${LINKER_SCRIPT} -Wl,--gc-sections -Wl,-Map=${PROJECT_NAME}.map -Wl,--entry=_estack")
-    # 
-
-#     target_compile_options(${PROJECT_NAME} PRIVATE
-#     -mcpu=${MCU}
-#     -mthumb
-#     -mfpu=fpv4-sp-d16
-#     -mfloat-abi=hard
-#     -Wall
-#     -Wextra
-#     ${DEBUG_FLAGS}
-#     -ffunction-sections
-#     -fdata-sections
-# )
-
-# target_link_options(${PROJECT_NAME} PRIVATE
-#     -T${LINKER_SCRIPT}
-#     -mcpu=${MCU}
-#     -mthumb
-#     -mfpu=fpv4-sp-d16
-#     -mfloat-abi=hard
-#     -specs=nano.specs
-#     -specs=nosys.specs
-#     -Wl,--gc-sections
-#     -Wl,-Map=${PROJECT_NAME}.map
-#     ${DEBUG_FLAGS}
-# )
-
-## TO DO
-# add_compiler_definitions() # to define macros
-
-# setting linker flags
-add_link_options(-mmcu=${COMPILE_MCU_NAME} -Wl,--gc-sections)
-
 # compiling and getting .elf file
-add_executable(${PROJECT_NAME}.elf "${${PROJECT_NAME}_SRC_FILES}") # main target
-target_link_libraries(${PROJECT_NAME}.elf PRIVATE ${MCAL_LIB} ${HAL_LIB})
+add_executable(${PROJECT_NAME}.elf "${${PROJECT_NAME}_SRC_FILES}" "${PROJECT_NAME}_STARTUP") # main target
 
-# calling macro for converting .elf into .hex and flashing it on specified mcu
-convert_to_hex_and_flash(${PROJECT_NAME} ${FLASH_MCU_NAME} ${PROGRAMMER})
-
-# modify the clean build rule to delete the .hex file
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_NAME}.hex)
-
-
-
-
-
-set(CMAKE_SYSTEM_NAME Generic)
-set(CMAKE_SYSTEM_PROCESSOR arm)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-cmake_minimum_required(VERSION 3.11)
-project(test C ASM)
-
-set(CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../COTS/CMAKE")
-set(BUILD_TOOLS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../COTS/COMMON")
-set(APP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
-set(MCAL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../COTS/MCAL)
-
-include("${CMAKE_DIR}/cortexm4.cmake")
-
-set(MCU cortex-m4)
-set(F_CPU 84000000) 
-
-set(STARTUP_FILE "${BUILD_TOOLS_DIR}/startup.c")
-set(LINKER_SCRIPT "${BUILD_TOOLS_DIR}/stm32f401cc.ld")
-
-add_executable(${PROJECT_NAME} ${APP_DIR})
-
-add_subdirectory("${MCAL_DIR}/RCC" "${CMAKE_BINARY_DIR}/RCC")
-
-target_link_libraries(${PROJECT_NAME} PUBLIC RCC)
-
-target_compile_options(${PROJECT_NAME} PRIVATE
-    -mcpu=${MCU}
-    -mthumb
-    -mfpu=fpv4-sp-d16
-    -mfloat-abi=hard
-    -Wall
-    -Wextra
-    ${DEBUG_FLAGS}
-    -ffunction-sections
+# compiler options for target
+target_compile_options( ${PROJECT_NAME}.elf
+    PRIVATE
+    -Wall 
+    -Wextra 
+    -g 
+    -Os 
+    -ffunction-sections 
     -fdata-sections
+    -mcpu=${MCU} 
+    -mthumb 
+    -mfpu=fpv4-sp-d16 
+    -mfloat-abi=hard
+    -pedantic
 )
 
-target_link_options(${PROJECT_NAME} PRIVATE
-    -T${LINKER_SCRIPT}
+# linker options for target
+target_link_options( ${PROJECT_NAME}.elf
+    PRIVATE
+    -T"${${PROJECT_NAME}_LINKER_SCRIPT}"
+    -Map=${PROJECT_NAME}.map
     -mcpu=${MCU}
     -mthumb
     -mfpu=fpv4-sp-d16
     -mfloat-abi=hard
     -specs=nano.specs
     -specs=nosys.specs
-    -Wl,--gc-sections
-    -Wl,-Map=${PROJECT_NAME}.map
-    ${DEBUG_FLAGS}
+    --entry=_estack
+    --gc-section
 )
 
-add_executable(${PROJECT_NAME} ${APP_DIR})
-
-add_subdirectory("${MCAL_DIR}/RCC" "${CMAKE_BINARY_DIR}/RCC")
-
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND arm-none-eabi-objcopy -O binary ${PROJECT_NAME} ${PROJECT_NAME}.bin
-    COMMAND arm-none-eabi-objcopy -O ihex ${PROJECT_NAME} ${PROJECT_NAME}.hex
-    COMMENT "Generating binary and hex files"
+# libraries to-be-linked with target
+target_link_libraries(${PROJECT_NAME}.elf 
+    PRIVATE 
+    ${MCAL_LIB} 
+    #${HAL_LIB}
 )
 
-# Optional: Add size information
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND arm-none-eabi-size ${PROJECT_NAME}
-    COMMENT "Displaying size information"
+# include directory for target
+target_include_directories(${PROJECT_NAME}.elf 
+    PRIVATE
+    "${${PROJECT_NAME}_INC_DIR}"
 )
+
+# calling macro for converting .elf into .hex
+convertToHex(${PROJECT_NAME})
+
+# calling macro for flashing .hex on mcu
+flashHEX(${PROJECT_NAME})
+
+# modify the clean build rule to delete generated .hex && .bin files
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_NAME}.hex ${PROJECT_NAME}.bin)

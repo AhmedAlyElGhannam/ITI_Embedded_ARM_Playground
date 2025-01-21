@@ -1,4 +1,4 @@
-#define NULL 0
+#include "std_types.h"
 
 typedef unsigned int uint32_t;
 
@@ -101,7 +101,8 @@ void FPU_IRQHandler                    (void) __attribute__ ((alias ("Default_Ha
 uint32_t * const MSP_Value = (uint32_t *)&_estack;
 
 /* Vector table for a Cortex M4 */
-uint32_t *Vector_Table[] __attribute__ ((section (".isr_vector"))) = {
+uint32_t *Vector_Table[] __attribute__ ((section (".isr_vector"))) = 
+{
     (uint32_t *)MSP_Value,                          /* Main Stack Pointer */
     (uint32_t *)Reset_Handler,                     /* Reset */
     (uint32_t *)NMI_Handler,                       /* Non maskable interrupt */
@@ -202,12 +203,14 @@ uint32_t *Vector_Table[] __attribute__ ((section (".isr_vector"))) = {
     (uint32_t *)FPU_IRQHandler,                    /* FPU                          */
 };
 
-static void System_Intitialization(void){
+static void System_Intitialization(void)
+{
     /* Clock intitialization */
 
 }
 
-void Reset_Handler(void){
+void Reset_Handler(void)
+{
     uint32_t Section_Size = 0;
     uint32_t *MemSourceAddr = NULL;
     uint32_t *MemDestAddr = NULL;
@@ -238,5 +241,5 @@ void Reset_Handler(void){
 
 void Default_Handler(void)
 {
-    while (1);
+    while (true);
 }
