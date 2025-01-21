@@ -80,6 +80,7 @@ typedef enum
     ALT_FUNC13 = 0x0DUL, /**< Alternate Function 13 */
     ALT_FUNC14 = 0x0EUL, /**< Alternate Function 14 */
     ALT_FUNC15 = 0x0FUL, /**< Alternate Function 15 */
+    ALT_FUNC_NONE = 0xF0UL
 } MGPIO_enuPinAltFunc_t;
 
 /**
@@ -124,6 +125,7 @@ typedef enum
     PIN_HIGH = 0x00000001UL, /**< Pin High value */
     PIN_LOW  = 0x00010000UL, /**< Pin Low value */
 } MGPIO_enuPinVal_t;
+
 
 /**
  * @brief Sets the mode of a GPIO pin.

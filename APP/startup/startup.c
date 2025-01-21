@@ -1,7 +1,5 @@
 #include "std_types.h"
 
-typedef unsigned int uint32_t;
-
 extern uint32_t _estack, _etext, _sdata, _edata, _sbss, _ebss, _sidata;
 
 extern int main(void);

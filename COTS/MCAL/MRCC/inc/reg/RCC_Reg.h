@@ -42,25 +42,7 @@ typedef unsigned long int uint32_t;
 typedef struct
 {
     volatile uint32_t CR;
-    
-    union 
-    {
-        volatile struct
-        {
-            const uint32_t reserved1          : 4;
-            volatile uint32_t PLLQ            : 4;
-            const uint32_t reserved2          : 1;
-            volatile uint32_t PLLSRC          : 1;
-            const uint32_t reserved2          : 4;
-            volatile uint32_t PLLP            : 2;
-            const uint32_t reserved3          : 1;
-            volatile uint32_t PLLN            : 9;
-            volatile uint32_t PLLM            : 6;
-        }PLLCFGR __attribute__((packed)); 
-
-        volatile uint32_t PLLCFGR_R; 
-    };       
-
+    volatile uint32_t PLLCFGR_R;      
     volatile uint32_t CFGR;          
     volatile uint32_t CIR;           
     volatile uint32_t AHB1RSTR;      

@@ -1,6 +1,10 @@
 #ifndef RCC_H
 #define RCC_H
 
+#include "RCC_PBCFG.h"
+#include "error_status.h"
+
+
 typedef enum
 {
     PLL_CLK_READY = 0x2000000ULL,

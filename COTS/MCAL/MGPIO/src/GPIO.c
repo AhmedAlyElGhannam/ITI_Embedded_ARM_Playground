@@ -9,6 +9,7 @@
 #include "error_status.h"  /**< Error status codes definition header */
 #include "GPIO_Reg.h"  /**< GPIO registers mapping header */
 #include "GPIO.h"  /**< GPIO module header */
+#include "GPIO_LCFG.h"
 
 /**
  * @brief Macro to check if the port is invalid.
@@ -64,6 +65,11 @@
  * @param VAL Pin value to check.
  */
 #define IS_INVALID_PIN_VAL(VAL)     ((VAL != PIN_HIGH) && (VAL != PIN_LOW))
+
+/**
+ * @brief Array for pin configurations
+ */
+extern MGPIO_structPinConfig_t global_structArrPinConfig[MGPIO_NUM_OF_PORTS * MGPIO_NUM_OF_PINS];
 
 /**
  * @brief Sets the mode of a specific GPIO pin.

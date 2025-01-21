@@ -1,10 +1,10 @@
 /* Highest address of the user mode stack */
 _estack = ORIGIN(RAM) + LENGTH(RAM); /* End of "RAM" Ram type memory */
 
-_Min_Heap_Size = 0x200 ;  /* Required amount of heap */
-_Min_Stack_Size = 0x400 ; /* Required amount of stack */
+_Min_Heap_Size = 0x200;  /* Required amount of heap */
+_Min_Stack_Size = 0x400; /* Required amount of stack */
 
-/* Memories definition -> Label_Name(AttributeList) : ORIGIN = StartMemoryAddress,   LENGTH = MemoryLength */
+/* Memories definition -> Label_Name(AttributeList) : ORIGIN = StartMemoryAddress, LENGTH = MemoryLength */
 MEMORY
 {
   CCMRAM (xrw)    : ORIGIN = 0x10000000,   LENGTH = 64K
@@ -13,7 +13,7 @@ MEMORY
 }
 
 /* Sections */
-SECTIONS{
+SECTIONS {
   /* The startup code into "FLASH" Rom type memory */
   .isr_vector :
   {
@@ -56,14 +56,15 @@ SECTIONS{
   } >RAM AT> FLASH
 
   /* .bss section, Uninitialized data section into "RAM" Ram type memory */
-   . = ALIGN(4);
   .bss :
   {
+    __bss_start__ = .; /* Define the start of the BSS section */
     _sbss = .;         /* Define a global symbol at bss start */
     *(.bss)            /* .bss sections */
     *(.bss*)           /* .bss* sections */
     . = ALIGN(4);
     _ebss = .;         /* Define a global symbol at bss end */
+    __bss_end__ = .;   /* Define the end of the BSS section */
   } >RAM
 
   /* .User_heap_stack section, used to check that there is enough "RAM" Ram  type memory left */

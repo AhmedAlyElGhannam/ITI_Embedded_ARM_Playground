@@ -4,8 +4,8 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 
 # arm-none-eabi- must be part of path environment
 set(TOOLCHAIN_PREFIX "/usr/bin/arm-none-eabi-")
-set(C_FLAGS "-fdata-sections -ffunction-sections --specs=nano.specs -Wl,--gc-sections")
-set(CPP_FLAGS "-fno-rtti -fno-exceptions -fno-threadsafe-statics")
+# set(C_FLAGS "-fdata-sections -ffunction-sections --specs=nano.specs -Wl,--gc-sections")
+# set(CPP_FLAGS "-fno-rtti -fno-exceptions -fno-threadsafe-statics")
 
 # defining toolchain bin tools
 set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}gcc ${C_FLAGS})

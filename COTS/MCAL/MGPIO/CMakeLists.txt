@@ -2,7 +2,10 @@
 cmake_minimum_required(VERSION 3.22)
 
 # project name + defining used languages
-project(MGPIO C CPP ASM) 
+project(MGPIO)
+
+# define used languages
+enable_language(C CXX ASM)
 
 # setting default compiler for C
 set(CMAKE_C_COMPILER "/usr/bin/arm-none-eabi-gcc")

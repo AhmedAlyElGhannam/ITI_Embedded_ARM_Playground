@@ -11,25 +11,16 @@ set(CMAKE_SYSTEM_PROCESSOR arm)
 set(CMAKE_C_STANDARD 99)
 
 # define a variable to store linker script name and path for this project
-set(${PROJECT_NAME}_LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/linker.ld)
+set(LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/linker_script/linker.ld)
 
 # define a variable to store startup file name and path for this project
-set(${PROJECT_NAME}_STARTUP ${CMAKE_CURRENT_SOURCE_DIR}/startup/startup.c)
+set(STARTUP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/startup/startup.c)
 
 # project name 
 project(ARM_PROJECT)
 
 # define used languages
 enable_language(C CXX ASM)
-
-# include .cmake script that contains used toolchain info
-include(${CMAKE_CURRENT_SOURCE_DIR}/../TOOLCHAIN/gcc-arm-none-eabi.cmake)
-
-# include .cmake script that contains flashing tool info
-include(${CMAKE_CURRENT_SOURCE_DIR}/../FLASH_TOOL/st-flash.cmake)
-
-# include ,cmake script for converting .elf to .hex/.bin and flashing
-include(${CMAKE_CURRENT_SOURCE_DIR}/../FLASH_SCRIPT/convert-to-hex-plus-flash.cmake)
 
 # arm mcu is cortex-m4 clocked @84MHz
 set(MCU cortex-m4)
@@ -73,8 +64,17 @@ endforeach()
 # 	)
 # endforeach()
 
+# include .cmake script that contains used toolchain info
+include(${CMAKE_CURRENT_SOURCE_DIR}/../TOOLCHAIN/gcc-arm-none-eabi.cmake)
+
+# include .cmake script that contains flashing tool info
+include(${CMAKE_CURRENT_SOURCE_DIR}/../FLASH_TOOL/st-flash.cmake)
+
+# include ,cmake script for converting .elf to .hex/.bin and flashing
+include(${CMAKE_CURRENT_SOURCE_DIR}/../FLASH_SCRIPT/convert-to-hex-plus-flash.cmake)
+
 # compiling and getting .elf file
-add_executable(${PROJECT_NAME}.elf "${${PROJECT_NAME}_SRC_FILES}" "${PROJECT_NAME}_STARTUP") # main target
+add_executable(${PROJECT_NAME}.elf "${${PROJECT_NAME}_SRC_FILES}" ${STARTUP_FILE}) # main target
 
 # compiler options for target
 target_compile_options( ${PROJECT_NAME}.elf
@@ -95,8 +95,7 @@ target_compile_options( ${PROJECT_NAME}.elf
 # linker options for target
 target_link_options( ${PROJECT_NAME}.elf
     PRIVATE
-    -T"${${PROJECT_NAME}_LINKER_SCRIPT}"
-    -Map=${PROJECT_NAME}.map
+    -T${LINKER_SCRIPT}
     -mcpu=${MCU}
     -mthumb
     -mfpu=fpv4-sp-d16
@@ -104,7 +103,7 @@ target_link_options( ${PROJECT_NAME}.elf
     -specs=nano.specs
     -specs=nosys.specs
     --entry=_estack
-    --gc-section
+    --data-sections
 )
 
 # libraries to-be-linked with target
@@ -127,4 +126,4 @@ convertToHex(${PROJECT_NAME})
 flashHEX(${PROJECT_NAME})
 
 # modify the clean build rule to delete generated .hex && .bin files
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_NAME}.hex ${PROJECT_NAME}.bin)
+# set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_NAME}.hex ${PROJECT_NAME}.bin)
