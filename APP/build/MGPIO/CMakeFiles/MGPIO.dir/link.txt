@@ -1,2 +1,0 @@
-/usr/bin/ar qc libMGPIO.a CMakeFiles/MGPIO.dir/src/GPIO.c.obj CMakeFiles/MGPIO.dir/src/GPIO_LCFG.c.obj
-/usr/bin/ranlib libMGPIO.a
