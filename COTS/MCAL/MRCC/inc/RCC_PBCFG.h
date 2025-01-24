@@ -26,4 +26,8 @@
 #define MRCC_APB1_PRESCALER     (MRCC_APB_DIV_BY_16)
 #define MRCC_APB2_PRESCALER     (MRCC_APB_DIV_BY_16)
 
+
+#define RCC_HSI_CLK_HZ           16000000
+#define RCC_HSE_CLK_HZ           25000000
+
 #endif

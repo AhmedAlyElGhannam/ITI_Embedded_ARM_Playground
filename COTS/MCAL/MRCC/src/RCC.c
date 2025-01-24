@@ -96,7 +96,7 @@ SRV_enuErrorStatus_t MRCC_enuSetClkSrcState(MRCC_enuClkType_t copy_enuClk, MRCC_
         else {}
 
         /* wait until clock is ready */
-        while ((RCC->CR & (~copy_enuClk)) & (local_uint16Timeout--));
+        while ((RCC->CR & (~copy_enuClk)) && (local_uint16Timeout--));
 
         /* if clk is supposed to be on && timeout reached 0 -> return error status */
         if ((local_uint16Timeout == 0) && (RCC->CR & copy_enuClk))
@@ -277,64 +277,146 @@ SRV_enuErrorStatus_t MRCC_enuSetPeripheralClkState(uint64_t copy_uint64Periphera
 
 #define MRCC_MASK_VERIFY_PLL_RDY    (0xFDFFFFFFUL)
 
+#define IS_INVALID_PLL_M_PRES_RANGE(M)  (((M) < 2) || ((M) > 63))
+#define IS_INVALID_PLL_N_MULT_RANGE(N)  (((N) < 192) || ((N) > 432))
+#define IS_INVALID_PLL_P_PRES_RANGE(P)  (((P) != 2) && ((P) != 4) && ((P) != 6) && ((P) != 8))
+#define IS_INVALID_PLL_Q_PRES_RANGE(Q)  (((Q) < 2) || ((Q) > 15))
+#define IS_INVALID_VCO_INPUT_FREQ(VCO)  (((VCO) < 1000000) || ((VCO) > 2000000))
+
+#define MRCC_MASK_VERIFY_PLL_SRC        (0xFEUL)
+#define IS_INVALID_PLL_SRC(CLK)     ((CLK) & MRCC_MASK_VERIFY_PLL_SRC)
+
 /**
  * @brief Configures the PLL (Phase Locked Loop).
  *
- * @param copy_enuPLLConfig Desired PLL configuration.
+ * @param copy_structPLLConfig Desired PLL configuration.
  * @return SRV_enuErrorStatus_t Error status of the operation.
  */
-SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_enuPLLConfig_t copy_enuPLLConfig)
+SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_structPLLConfig_t* copy_structPLLConfig)
 {
     SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
     uint16_t local_uint16WaitTimeout = MRCC_CLK_WAIT_TIMEOUT;
-    volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;;
+    volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
+    uint32_t local_uint32VCO = 0;
 
     if (IS_PLL_ENABLED())
     {
         ret_enuErrorStatus = RCC_PLL_CFG_WHILE_EN;
     }
-    else if (IS_VALID_PLL_CONFIG(copy_enuPLLConfig))
+    else if (IS_NULL_PTR(copy_structPLLConfig))
     {
-        ret_enuErrorStatus = INV_ARG;
+        ret_enuErrorStatus = NULL_PTR;
+    }
+    else if (IS_INVALID_PLL_M_PRES_RANGE(copy_structPLLConfig->M_Prescaler))
+    {
+        ret_enuErrorStatus = RCC_PLL_INV_M;
+    }
+    else if (IS_INVALID_PLL_N_MULT_RANGE(copy_structPLLConfig->N_Multiplier))
+    {
+        ret_enuErrorStatus = RCC_PLL_INV_N;
+    }
+    else if (IS_INVALID_PLL_P_PRES_RANGE(copy_structPLLConfig->P_Prescaler))
+    {
+        ret_enuErrorStatus = RCC_PLL_INV_P;
+    }
+    else if (IS_INVALID_PLL_Q_PRES_RANGE(copy_structPLLConfig->Q_Prescaler))
+    {
+        ret_enuErrorStatus = RCC_PLL_INV_Q;
+    }
+    else if (IS_INVALID_PLL_SRC(copy_structPLLConfig->PLL_Src))
+    {
+        ret_enuErrorStatus = RCC_INV_PLL_SRC;
     }
     else
     {
-        RCC->PLLCFGR &= (~copy_enuPLLConfig);
-
-        RCC->PLLCFGR |= (copy_enuPLLConfig);
-
-        RCC->CR |= MRCC_MASK_ENABLE_PLL;
-
-        while ((RCC->CR & (~MRCC_MASK_VERIFY_PLL_RDY)) && local_uint16WaitTimeout--);
-
-        if ((local_uint16WaitTimeout == 0) && (RCC->CR & MRCC_MASK_VERIFY_PLL_RDY))
+        if (copy_structPLLConfig->PLL_Src == MRCC_PLL_SRC_HSI)
         {
-            ret_enuErrorStatus = RCC_TIMEOUT;
+            local_uint32VCO = RCC_HSI_CLK_HZ / copy_structPLLConfig->M_Prescaler;
+        }
+        else if (copy_structPLLConfig->PLL_Src == MRCC_PLL_SRC_HSE)
+        {
+            local_uint32VCO = RCC_HSE_CLK_HZ / copy_structPLLConfig->M_Prescaler;
+        }
+        else {}
+
+        if (IS_INVALID_VCO_INPUT_FREQ(local_uint32VCO))
+        {
+            ret_enuErrorStatus = RCC_INV_PLL_SRC;
+        }
+        else
+        {
+            RCC->PLLCFGR = (copy_structPLLConfig->Q_Prescaler << 24) | (copy_structPLLConfig->PLL_Src << 22) | (copy_structPLLConfig->P_Prescaler << 16) | (copy_structPLLConfig->N_Multiplier << 6) | (copy_structPLLConfig->M_Prescaler);
+
+            RCC->CR |= MRCC_MASK_ENABLE_PLL;
+
+            while ((RCC->CR & (~MRCC_MASK_VERIFY_PLL_RDY)) && local_uint16WaitTimeout--);
+
+            if ((local_uint16WaitTimeout == 0) && (RCC->CR & (~MRCC_MASK_VERIFY_PLL_RDY)))
+            {
+                ret_enuErrorStatus = RCC_TIMEOUT;
+            }
+            else {}
         }
     }
 
     return ret_enuErrorStatus;
 }
 
+#define IS_INVALID_AHB_CLK_PRESCALER(AHB)   (((AHB) < 0b1000) || ((AHB) > 0b1111))
+#define IS_INVALID_APB_LS_CLK_PRESCALER(APB)   (((APB) < 0b100) || ((APB) > 0b111))
+#define IS_INVALID_APB_HS_CLK_PRESCALER(APB)   (((APB) < 0b100) || ((APB) > 0b111))
+
+#define MRCC_MASK_SET_BUS_CLK_PRESCALER     (0xFFFF030FUL)
 /**
  * @brief Sets the peripheral bus prescaler configuration.
  *
  * @param copy_enuBusPrescalers Desired bus prescaler configuration.
  * @return SRV_enuErrorStatus_t Error status of the operation.
  */
-SRV_enuErrorStatus_t MRCC_enuSetPeripheralBusesPrescaler(MRCC_enuPeriphBusPresConfig_t copy_enuBusPrescalers)
+SRV_enuErrorStatus_t MRCC_enuSetBusClkPrescaler(MRCC_structBusClkPrescaler_t* copy_structBusClkPrescalers)
 {
     SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
     volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
 
-    if (IS_INVALID_ALL_BUS_PRESCALER(copy_enuBusPrescalers))
+    if (IS_NULL_PTR(copy_structBusClkPrescalers))
     {
-        ret_enuErrorStatus = INV_ARG;
+        ret_enuErrorStatus = NULL_PTR;
+    }
+    else if (IS_INVALID_AHB_CLK_PRESCALER(copy_structBusClkPrescalers->AHB_Prescaler))
+    {
+        ret_enuErrorStatus = RCC_INV_AHB_CLK_PRE;
+    }
+    else if (IS_INVALID_APB_LS_CLK_PRESCALER(copy_structBusClkPrescalers->APB_LowSpeedPrescaler))
+    {
+        ret_enuErrorStatus = RCC_INV_APB_LS_CLK_PRE;
+    }
+    else if (IS_INVALID_APB_HS_CLK_PRESCALER(copy_structBusClkPrescalers->APB_HighSpeedPrescaler))
+    {
+        ret_enuErrorStatus = RCC_INV_APB_HS_CLK_PRE;
     }
     else
     {
-        RCC->CFGR = ((RCC->CFGR & RCC_BUS_PRESCALER_MASK) | copy_enuBusPrescalers);
+        RCC->CFGR = ((RCC->CFGR & MRCC_MASK_SET_BUS_CLK_PRESCALER) | (copy_structBusClkPrescalers->AHB_Prescaler << 4) | (copy_structBusClkPrescalers->APB_LowSpeedPrescaler << 10) | (copy_structBusClkPrescalers->APB_HighSpeedPrescaler << 13));
     }
 
+    return ret_enuErrorStatus;
+}
+
+
+#define MRCC_MASK_SET_CLK_INT_RDY   (0xFFFFC0FFUL)
+SRV_enuErrorStatus_t MRCC_enuSetClkReadyInterruptState(MRCC_structClkReadyInterrupt_t* copy_structClkReadyInterrupt)
+{
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
+    volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
+
+    if (IS_NULL_PTR(copy_structClkReadyInterrupt))
+    {
+        ret_enuErrorStatus = NULL_PTR;
+    }
+    else 
+    {
+        RCC->CIR = ((RCC->CIR) & MRCC_MASK_SET_CLK_INT_RDY) | (copy_structClkReadyInterrupt->HSE << 11) | (copy_structClkReadyInterrupt->HSI << 10) | (copy_structClkReadyInterrupt->LSE << 9) | (copy_structClkReadyInterrupt->LSI << 8) | (copy_structClkReadyInterrupt->PLL << 12) | (copy_structClkReadyInterrupt->PLLI2S << 13);
+    }
+    
     return ret_enuErrorStatus;
 }

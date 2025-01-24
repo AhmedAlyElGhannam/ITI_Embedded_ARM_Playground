@@ -60,6 +60,12 @@ typedef enum
     MRCC_PERIPHERAL_CLK_LP_EN = 3U,
 } MRCC_enuPeripheralClkState_t;
 
+typedef enum
+{
+    MRCC_PLL_SRC_HSI = 0U,
+    MRCC_PLL_SRC_HSE = 1U,
+} MRCC_enuPLLClkSource_t;
+
 
 #define MRCC_AHB1_BUS    (0xFF9FEF70UL)
 #define MRCC_AHB1_GPIOA  (0xFF9FEF7000000001ULL)
@@ -105,6 +111,58 @@ typedef enum
 #define MRCC_APB2_TIM11     (0xFFF886CE00040000ULL)
 
 
+typedef struct 
+{
+    /* data */
+    uint8_t M_Prescaler;
+    uint8_t P_Prescaler;
+    uint8_t PLL_Src;
+    uint8_t Q_Prescaler;
+    uint32_t N_Multiplier;
+} MRCC_structPLLConfig_t;
+
+typedef struct
+{
+    uint8_t APB_LowSpeedPrescaler;
+    uint8_t APB_HighSpeedPrescaler;
+    uint16_t AHB_Prescaler;
+} MRCC_structBusClkPrescaler_t;
+
+typedef enum
+{
+    MRCC_INT_RDY_ON = 1U,
+    MRCC_INT_RDY_OFF = 0U,
+} MRCC_enuClkReadyInterruptState_t;
+
+typedef struct 
+{
+    uint8_t LSI     : 1;
+    uint8_t LSE     : 1;
+    uint8_t HSI     : 1;
+    uint8_t HSE     : 1;
+    uint8_t PLL     : 1;
+    uint8_t PLLI2S  : 1;
+} MRCC_structClkReadyInterrupt_t;
+
+
+typedef struct 
+{
+    /* data */
+    uint32_t M_Prescaler;
+    uint32_t N_Multiplier;
+    uint32_t P_Prescaler;
+    uint32_t PLL_Src;
+    uint32_t Q_Prescaler;
+} MRCC_structPLLI2CConfig_t;
+
+
+
+
+
+
+
+
+
 
 
 
@@ -120,13 +178,6 @@ typedef enum
     PLL_COMBINED_PRE = (PLL_M | PLL_N | PLL_P | PLL_Q | PLL_SRC),  /* use this value in PLL_config function */
 } MRCC_enuPLLConfig_t;
 
-typedef enum 
-{
-    AHB1_PRE = (MRCC_AHB1_PRESCALER << 4) & (0xF0UL),
-    APB1_PRE = (MRCC_APB1_PRESCALER << 10) & (0x1C00UL),
-    APB2_PRE = (MRCC_APB2_PRESCALER << 13) & (0xE000UL),
-    PERIPH_COMBINED_PRE = (AHB1_PRE | APB1_PRE | APB2_PRE),  /* use this value in bus prescaler function */
-} MRCC_enuPeriphBusPresConfig_t;
 
 typedef enum
 {
