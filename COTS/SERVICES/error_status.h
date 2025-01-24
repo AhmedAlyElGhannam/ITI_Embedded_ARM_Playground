@@ -9,6 +9,8 @@ typedef enum
     NULL_PTR,
     INV_ARG,
     RCC_TIMEOUT,
+    RCC_INV_CLK,
+    RCC_INV_CFG,
     RCC_INV_CLK_SRC,
     RCC_PLL_CFG_WHILE_EN,
     GPIO_INV_PORT,

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libMRCC.a CMakeFiles/MRCC.dir/src/RCC.c.obj
+/usr/bin/ranlib libMRCC.a

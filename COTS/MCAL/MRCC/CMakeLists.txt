@@ -31,8 +31,24 @@ set(${PROJECT_NAME}_INC_DIRS "${${PROJECT_NAME}_LIB_INC_DIR}" "${${PROJECT_NAME}
 # create a static library
 add_library(${PROJECT_NAME} STATIC "${${PROJECT_NAME}_SRC_FILES}")
 
+# compiler options for target
+target_compile_options( ${PROJECT_NAME}
+    PRIVATE
+    -Wall 
+    -Wextra 
+    -g 
+    -Os 
+    -ffunction-sections 
+    -fdata-sections
+    -mcpu=${MCU} 
+    -mthumb 
+    -mfpu=fpv4-sp-d16 
+    -mfloat-abi=hard
+    -pedantic
+)
+
 # in order to allow main to use .h & pbcfg.h -> make them public
 target_include_directories(${PROJECT_NAME} PUBLIC "${${PROJECT_NAME}_INC_DIRS}")
 
 # registers should ABSOLUTELY BE private
-target_include_directories(${PROJECT_NAME} PRIVATE "${${PROJECT_NAME}_REG_INC_DIR}")
+target_include_directories(${PROJECT_NAME} PUBLIC "${${PROJECT_NAME}_REG_INC_DIR}")

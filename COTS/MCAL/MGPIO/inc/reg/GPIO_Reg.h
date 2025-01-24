@@ -15,9 +15,9 @@ typedef struct
     volatile uint32_t AFRH;
 } GPIOx_Registers_t;
 
-#define GPIO_BASE_ADDRESS   ((volatile uint32_t*)0x40020000ULL)
+#define GPIO_BASE_ADDRESS   ((uint32_t)0x40020000UL)
 #define GPIO_GET_PORT_ADDRESS(GPIOx)    \
-    ((GPIOx_Registers_t*)(GPIO_BASE_ADDRESS + (((uint32_t)GPIOx) * 0x400UL)))
+    ((GPIOx_Registers_t*)(((GPIO_BASE_ADDRESS) + (((uint32_t)(GPIOx)) * (0x400UL)))))
 
 
 #endif

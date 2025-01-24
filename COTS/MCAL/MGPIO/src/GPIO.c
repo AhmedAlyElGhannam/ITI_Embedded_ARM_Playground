@@ -15,14 +15,14 @@
  * @brief Macro to check if the port is invalid.
  * @param GPIOx GPIO port to check.
  */
-#define IS_INVALID_PORT(GPIOx)  ((GPIOx == GPIOF) || (GPIOx == GPIOG) || (GPIOx > GPIOH))
+#define IS_INVALID_PORT(GPIOx)  ((GPIOx == GPIOF) || (GPIOx == GPIOG) || (GPIOx >= GPIOH))
 
 /**
  * @brief Macro to check if the pin is invalid for a specific port.
  * @param GPIOx GPIO port.
  * @param PINx GPIO pin.
  */
-#define IS_INVALID_PIN(GPIOx, PINx)    ((PINx > PIN15) || ((PINx > PIN01) && (GPIOx == GPIOH)))
+#define IS_INVALID_PIN(PINx)    ((PINx > PIN15))
 
 /**
  * @brief Macro to check if a pointer is NULL.
@@ -86,7 +86,7 @@ SRV_enuErrorStatus_t MGPIO_enuSetPinMode(MGPIO_enuPortDesignator_t copy_enuPortN
     {
         ret_enuErrorStatus = GPIO_INV_PORT;
     }
-    else if (IS_INVALID_PIN(copy_enuPortNum, copy_enuPinNum))
+    else if (IS_INVALID_PIN(copy_enuPinNum))
     {
         ret_enuErrorStatus = GPIO_INV_PIN;
     }
@@ -98,7 +98,8 @@ SRV_enuErrorStatus_t MGPIO_enuSetPinMode(MGPIO_enuPortDesignator_t copy_enuPortN
     {
         GPIOx_Registers_t* ptr_structGPIOPortBaseAdd = GPIO_GET_PORT_ADDRESS(copy_enuPortNum);
 
-        ptr_structGPIOPortBaseAdd->MODER = (ptr_structGPIOPortBaseAdd->MODER & ~(0x03UL << (2 * copy_enuPinNum))) | (copy_enuPinMode << (2 * copy_enuPinNum));
+        ptr_structGPIOPortBaseAdd->MODER &= ~(0x03UL << (2 * copy_enuPinNum));
+        ptr_structGPIOPortBaseAdd->MODER |= (copy_enuPinMode << (2 * copy_enuPinNum));
     }
 
     return ret_enuErrorStatus;
@@ -119,7 +120,7 @@ SRV_enuErrorStatus_t MGPIO_enuAltFuncSel(MGPIO_enuPortDesignator_t copy_enuPortN
     {
         ret_enuErrorStatus = GPIO_INV_PORT;
     }
-    else if (IS_INVALID_PIN(copy_enuPortNum, copy_enuPinNum))
+    else if (IS_INVALID_PIN(copy_enuPinNum))
     {
         ret_enuErrorStatus = GPIO_INV_PIN;
     }
@@ -161,7 +162,7 @@ SRV_enuErrorStatus_t MGPIO_enuOutputType(MGPIO_enuPortDesignator_t copy_enuPortN
     {
         ret_enuErrorStatus = GPIO_INV_PORT;
     }
-    else if (IS_INVALID_PIN(copy_enuPortNum, copy_enuPinNum))
+    else if (IS_INVALID_PIN(copy_enuPinNum))
     {
         ret_enuErrorStatus = GPIO_INV_PIN;
     }
@@ -194,7 +195,7 @@ SRV_enuErrorStatus_t MGPIO_enuOutputSpeed(MGPIO_enuPortDesignator_t copy_enuPort
     {
         ret_enuErrorStatus = GPIO_INV_PORT;
     }
-    else if (IS_INVALID_PIN(copy_enuPortNum, copy_enuPinNum))
+    else if (IS_INVALID_PIN(copy_enuPinNum))
     {
         ret_enuErrorStatus = GPIO_INV_PIN;
     }
@@ -227,7 +228,7 @@ SRV_enuErrorStatus_t MGPIO_enuPinResConfig(MGPIO_enuPortDesignator_t copy_enuPor
     {
         ret_enuErrorStatus = GPIO_INV_PORT;
     }
-    else if (IS_INVALID_PIN(copy_enuPortNum, copy_enuPinNum))
+    else if (IS_INVALID_PIN(copy_enuPinNum))
     {
         ret_enuErrorStatus = GPIO_INV_PIN;
     }
@@ -260,7 +261,7 @@ SRV_enuErrorStatus_t MGPIO_enuSetPinVal(MGPIO_enuPortDesignator_t copy_enuPortNu
     {
         ret_enuErrorStatus = GPIO_INV_PORT;
     }
-    else if (IS_INVALID_PIN(copy_enuPortNum, copy_enuPinNum))
+    else if (IS_INVALID_PIN(copy_enuPinNum))
     {
         ret_enuErrorStatus = GPIO_INV_PIN;
     }
@@ -293,7 +294,7 @@ SRV_enuErrorStatus_t MGPIO_enuGetPinVal(MGPIO_enuPortDesignator_t copy_enuPortNu
     {
         ret_enuErrorStatus = GPIO_INV_PORT;
     }
-    else if (IS_INVALID_PIN(copy_enuPortNum, copy_enuPinNum))
+    else if (IS_INVALID_PIN(copy_enuPinNum))
     {
         ret_enuErrorStatus = GPIO_INV_PIN;
     }
@@ -325,7 +326,7 @@ SRV_enuErrorStatus_t MGPIO_enuPinLockEnable(MGPIO_enuPortDesignator_t copy_enuPo
     {
         ret_enuErrorStatus = GPIO_INV_PORT;
     }
-    else if (IS_INVALID_PIN(copy_enuPortNum, copy_enuPinNum))
+    else if (IS_INVALID_PIN(copy_enuPinNum))
     {
         ret_enuErrorStatus = GPIO_INV_PIN;
     }

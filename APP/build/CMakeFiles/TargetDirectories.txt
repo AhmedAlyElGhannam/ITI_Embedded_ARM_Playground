@@ -1,0 +1,11 @@
+/home/nemesis/Playground/Github_Repositories/ITI_EmbeddedSystemsBareMetal/ITI_Embedded_ARM_Playground/APP/build/CMakeFiles/ARM_PROJECT.elf.dir
+/home/nemesis/Playground/Github_Repositories/ITI_EmbeddedSystemsBareMetal/ITI_Embedded_ARM_Playground/APP/build/CMakeFiles/convert-elf-to-hex.dir
+/home/nemesis/Playground/Github_Repositories/ITI_EmbeddedSystemsBareMetal/ITI_Embedded_ARM_Playground/APP/build/CMakeFiles/flash-hex.dir
+/home/nemesis/Playground/Github_Repositories/ITI_EmbeddedSystemsBareMetal/ITI_Embedded_ARM_Playground/APP/build/CMakeFiles/edit_cache.dir
+/home/nemesis/Playground/Github_Repositories/ITI_EmbeddedSystemsBareMetal/ITI_Embedded_ARM_Playground/APP/build/CMakeFiles/rebuild_cache.dir
+/home/nemesis/Playground/Github_Repositories/ITI_EmbeddedSystemsBareMetal/ITI_Embedded_ARM_Playground/APP/build/MRCC/CMakeFiles/MRCC.dir
+/home/nemesis/Playground/Github_Repositories/ITI_EmbeddedSystemsBareMetal/ITI_Embedded_ARM_Playground/APP/build/MRCC/CMakeFiles/edit_cache.dir
+/home/nemesis/Playground/Github_Repositories/ITI_EmbeddedSystemsBareMetal/ITI_Embedded_ARM_Playground/APP/build/MRCC/CMakeFiles/rebuild_cache.dir
+/home/nemesis/Playground/Github_Repositories/ITI_EmbeddedSystemsBareMetal/ITI_Embedded_ARM_Playground/APP/build/MGPIO/CMakeFiles/MGPIO.dir
+/home/nemesis/Playground/Github_Repositories/ITI_EmbeddedSystemsBareMetal/ITI_Embedded_ARM_Playground/APP/build/MGPIO/CMakeFiles/edit_cache.dir
+/home/nemesis/Playground/Github_Repositories/ITI_EmbeddedSystemsBareMetal/ITI_Embedded_ARM_Playground/APP/build/MGPIO/CMakeFiles/rebuild_cache.dir

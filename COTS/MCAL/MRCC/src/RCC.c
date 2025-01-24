@@ -12,7 +12,7 @@
 /** @defgroup RCC_Timeout_Configuration 
  *  @brief Macros related to RCC timeout settings.
  *  @{ */
-#define MRCC_WAIT_TIMEOUT   1000 /**< Timeout value for RCC operations */
+#define MRCC_CLK_WAIT_TIMEOUT   1000 /**< Timeout value for RCC operations */
 /** @} */
 
 /** @defgroup RCC_Clock_Source_Masks
@@ -55,10 +55,63 @@
 #define IS_INVALID_ALL_BUS_PRESCALER(PRE)   ((PRE & RCC_BUS_PRESCALER_MASK) != 0x00UL) /**< Checks if the bus prescaler configuration is invalid */
 #define IS_PLL_CLK_SRC_HSI(SRC)             (((SRC >> 22) & (1U)) == 0x00UL) /**< Checks if the PLL clock source is HSI */
 #define IS_PLL_CLK_SRC_HSE(SRC)             (((SRC >> 22) & (1U)) == 0x01UL) /**< Checks if the PLL clock source is HSE */
-#define IS_VALID_PLL_CONFIG(CFG)            ((CFG & RCC_PLL_MASK) != 0x00UL) /**< Checks if the PLL configuration is valid */
+#define IS_VALID_PLL_CONFIG(CFG)            ((CFG) & MRCC_MASK_VERIFY_PLL_CFG) /**< Checks if the PLL configuration is valid */
 #define IS_NULL_PTR(PTR)                    (PTR == NULL) /**< Checks if a pointer is null */
 #define IS_VALID_SYS_CLK_SRC(SYSCLK)        ((SYSCLK != MRCC_SYS_CLK_HSI) && (SYSCLK != MRCC_SYS_CLK_HSE) && (SYSCLK != MRCC_SYS_CLK_PLL)) /**< Checks if the system clock source is valid */
+#define IS_PLL_ENABLED()                    (((RCC->CR) >> 24) & 0x01U)
 /** @} */
+
+
+
+#define MRCC_MASK_VERIFY_CLK_CTRL       (0xF0FCFFFCUL)
+#define IS_INVALID_CLK(CLK)     (MRCC_MASK_VERIFY_CLK_CTRL & (CLK))
+
+#define MRCC_MASK_VERIFY_CLK_CFG        (0xFCUL)
+#define IS_INVALID_CLK_CFG(CFG)         (MRCC_MASK_VERIFY_CLK_CFG & (CFG))
+
+SRV_enuErrorStatus_t MRCC_enuSetClkSrcState(MRCC_enuClkType_t copy_enuClk, MRCC_enuClkSrcState_t copy_enuClkSrcState)
+{
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
+    volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
+    uint16_t local_uint16Timeout = MRCC_CLK_WAIT_TIMEOUT;
+
+    if (IS_INVALID_CLK(copy_enuClk))
+    {
+        ret_enuErrorStatus = RCC_INV_CLK;
+    }
+    else if (IS_INVALID_CLK_CFG(copy_enuClkSrcState))
+    {
+        ret_enuErrorStatus = RCC_INV_CFG;
+    }
+    else 
+    {
+        /* clear before setting */
+        RCC->CR &= (~copy_enuClk);
+
+        /* if state is on -> set it : else -> leave it 0 */
+        if (copy_enuClkSrcState == MRCC_CLK_SRC_ENABLE)
+        {
+            RCC->CR |= (copy_enuClk);
+        }
+        else {}
+
+        /* wait until clock is ready */
+        while ((RCC->CR & (~copy_enuClk)) & (local_uint16Timeout--));
+
+        /* if clk is supposed to be on && timeout reached 0 -> return error status */
+        if ((local_uint16Timeout == 0) && (RCC->CR & copy_enuClk))
+        {
+            ret_enuErrorStatus = RCC_TIMEOUT;
+        }
+        else {}
+    }
+
+    return ret_enuErrorStatus;
+}
+
+
+#define MRCC_MASK_VERIFY_SYS_CLK_SRC    (0xFCUL)
+#define IS_INVALID_SYS_CLK_SRC(CLK)     (MRCC_MASK_VERIFY_SYS_CLK_SRC & (CLK))
 
 /**
  * @brief Sets the system clock source.
@@ -66,22 +119,28 @@
  * @param copy_enuSysClkSrc Desired system clock source.
  * @return SRV_enuErrorStatus_t Error status of the operation.
  */
-SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc(MRCC_enuSYSCLK_t copy_enuSysClkSrc)
+SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc(MRCC_enuSysClkSrc_t copy_enuSysClkSrc)
 {
     SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
+    volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;;
 
-    if (IS_VALID_SYS_CLK_SRC(copy_enuSysClkSrc))
+    if (IS_INVALID_SYS_CLK_SRC(copy_enuSysClkSrc))
     {
         ret_enuErrorStatus = RCC_INV_CLK_SRC;
     }
     else
     {
+        /* clear before setting */
+        RCC->CFGR &= (~copy_enuSysClkSrc);
+
         /* Set system clock source */
-        RCC->CFGR = ((RCC->CFGR & RCC_SYS_CLK_SET_MASK) | copy_enuSysClkSrc);
+        RCC->CFGR |= copy_enuSysClkSrc;
     }
 
     return ret_enuErrorStatus;
 }
+
+#define MRCC_MASK_GET_SYS_CLK_SRC       (0xFFFFFFF3UL)
 
 /**
  * @brief Gets the current system clock source.
@@ -92,6 +151,7 @@ SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc(MRCC_enuSYSCLK_t copy_enuSysClkSrc)
 SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc(uint32_t* ptr_uint32SysClkSrc)
 {
     SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
+    volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;;
 
     if (IS_NULL_PTR(ptr_uint32SysClkSrc))
     {
@@ -99,11 +159,123 @@ SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc(uint32_t* ptr_uint32SysClkSrc)
     }
     else
     {
-        (*ptr_uint32SysClkSrc) = ((RCC->CFGR & ~RCC_SYS_CLK_GET_MASK) >> 2);
+        (*ptr_uint32SysClkSrc) = ((RCC->CFGR & ~MRCC_MASK_GET_SYS_CLK_SRC) >> 2);
     }
 
     return ret_enuErrorStatus;
 }
+
+
+SRV_enuErrorStatus_t MRCC_enuSetPeripheralClkState(uint64_t copy_uint64Peripheral, MRCC_enuPeripheralClkState_t copy_enuPeripheralClkState)
+{
+    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
+    volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
+    uint16_t local_uint16Timeout = MRCC_CLK_WAIT_TIMEOUT;
+
+    if (IS_INVALID_CLK_CFG(copy_enuPeripheralClkState))
+    {
+        ret_enuErrorStatus = RCC_INV_CFG;
+    }
+    else
+    {
+        switch (copy_uint64Peripheral >> 32)
+        {
+            case MRCC_AHB1_BUS:
+                if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_DISABLE)
+                {
+                    RCC->AHB1ENR &= ((uint32_t)((~copy_uint64Peripheral) & 0x00000000FFFFFFFFULL));
+                }
+                else if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_ENABLE)
+                {
+                    RCC->AHB1ENR |= ((uint32_t)(copy_uint64Peripheral & 0x00000000FFFFFFFFULL));
+                }
+                else if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_RESET)
+                {
+                    RCC->AHB1RSTR |= ((uint32_t)(copy_uint64Peripheral & 0x00000000FFFFFFFFULL));
+                }
+                else if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_LP_EN)
+                {
+                    RCC->AHB1LPENR |= ((uint32_t)(copy_uint64Peripheral & 0x00000000FFFFFFFFULL));
+                }
+                else {}
+            break;
+    
+            case MRCC_AHB2_BUS:
+                if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_DISABLE)
+                {
+                    RCC->AHB2ENR &= ((uint32_t)((~copy_uint64Peripheral) & 0x00000000FFFFFFFFULL));
+                }
+                else if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_ENABLE)
+                {
+                    RCC->AHB2ENR |= ((uint32_t)(copy_uint64Peripheral & 0x00000000FFFFFFFFULL));
+                }
+                else if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_RESET)
+                {
+                    RCC->AHB2RSTR |= ((uint32_t)(copy_uint64Peripheral & 0x00000000FFFFFFFFULL));
+                }
+                else if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_LP_EN)
+                {
+                    RCC->AHB2LPENR |= ((uint32_t)(copy_uint64Peripheral & 0x00000000FFFFFFFFULL));
+                }
+                else {}
+            break;
+    
+            case MRCC_APB1_BUS:
+                if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_DISABLE)
+                {
+                    RCC->APB1ENR &= ((uint32_t)((~copy_uint64Peripheral) & 0x00000000FFFFFFFFULL));
+                }
+                else if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_ENABLE)
+                {
+                    RCC->APB1ENR |= ((uint32_t)(copy_uint64Peripheral & 0x00000000FFFFFFFFULL));
+                }
+                else if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_RESET)
+                {
+                    RCC->APB1RSTR |= ((uint32_t)(copy_uint64Peripheral & 0x00000000FFFFFFFFULL));
+                }
+                else if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_LP_EN)
+                {
+                    RCC->APB1LPENR |= ((uint32_t)(copy_uint64Peripheral & 0x00000000FFFFFFFFULL));
+                }
+                else {}
+            break;
+    
+            case MRCC_APB2_BUS:
+                if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_DISABLE)
+                {
+                    RCC->APB2ENR &= ((uint32_t)((~copy_uint64Peripheral) & 0x00000000FFFFFFFFULL));
+                }
+                else if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_ENABLE)
+                {
+                    RCC->APB2ENR |= ((uint32_t)(copy_uint64Peripheral & 0x00000000FFFFFFFFULL));
+                }
+                else if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_RESET)
+                {
+                    RCC->APB2RSTR |= ((uint32_t)(copy_uint64Peripheral & 0x00000000FFFFFFFFULL));
+                }
+                else if (copy_enuPeripheralClkState == MRCC_PERIPHERAL_CLK_LP_EN)
+                {
+                    RCC->APB2LPENR |= ((uint32_t)(copy_uint64Peripheral & 0x00000000FFFFFFFFULL));
+                }
+                else {}
+            break;
+    
+            default:
+                ret_enuErrorStatus = INV_ARG;
+        }
+    }
+
+    return ret_enuErrorStatus;
+
+}
+
+
+#define MRCC_MASK_VERIFY_PLL_CFG    (0xF0BC8000ULL)
+#define IS_VALID_PLL_CONFIG(CFG)    ((CFG) & MRCC_MASK_VERIFY_PLL_CFG) /**< Checks if the PLL configuration is valid */
+
+#define MRCC_MASK_ENABLE_PLL        (0x01UL << 24U)
+
+#define MRCC_MASK_VERIFY_PLL_RDY    (0xFDFFFFFFUL)
 
 /**
  * @brief Configures the PLL (Phase Locked Loop).
@@ -114,7 +286,8 @@ SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc(uint32_t* ptr_uint32SysClkSrc)
 SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_enuPLLConfig_t copy_enuPLLConfig)
 {
     SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-    uint16_t local_uint16WaitTimeout = MRCC_WAIT_TIMEOUT;
+    uint16_t local_uint16WaitTimeout = MRCC_CLK_WAIT_TIMEOUT;
+    volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;;
 
     if (IS_PLL_ENABLED())
     {
@@ -126,30 +299,17 @@ SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_enuPLLConfig_t copy_enuPLLConfig)
     }
     else
     {
-        if (IS_PLL_CLK_SRC_HSI(copy_enuPLLConfig)) /* HSI */
-        {
-            while (MRCC_IS_HSI_READY() && local_uint16WaitTimeout--);
-        }
-        else if (IS_PLL_CLK_SRC_HSE(copy_enuPLLConfig)) /* HSE */
-        {
-            while (MRCC_IS_HSE_READY() && local_uint16WaitTimeout--);
-        }
+        RCC->PLLCFGR &= (~copy_enuPLLConfig);
 
-        if (local_uint16WaitTimeout == 0)
+        RCC->PLLCFGR |= (copy_enuPLLConfig);
+
+        RCC->CR |= MRCC_MASK_ENABLE_PLL;
+
+        while ((RCC->CR & (~MRCC_MASK_VERIFY_PLL_RDY)) && local_uint16WaitTimeout--);
+
+        if ((local_uint16WaitTimeout == 0) && (RCC->CR & MRCC_MASK_VERIFY_PLL_RDY))
         {
             ret_enuErrorStatus = RCC_TIMEOUT;
-        }
-        else
-        {
-            RCC->PLLCFGR_R = ((RCC->PLLCFGR_R & RCC_PLL_MASK) | copy_enuPLLConfig);
-            MRCC_PLL_ENABLE();
-            local_uint16WaitTimeout = MRCC_WAIT_TIMEOUT;
-            while (MRCC_IS_PLL_READY() && local_uint16WaitTimeout--);
-
-            if (local_uint16WaitTimeout == 0)
-            {
-                ret_enuErrorStatus = RCC_TIMEOUT;
-            }
         }
     }
 
@@ -165,6 +325,7 @@ SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_enuPLLConfig_t copy_enuPLLConfig)
 SRV_enuErrorStatus_t MRCC_enuSetPeripheralBusesPrescaler(MRCC_enuPeriphBusPresConfig_t copy_enuBusPrescalers)
 {
     SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
+    volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
 
     if (IS_INVALID_ALL_BUS_PRESCALER(copy_enuBusPrescalers))
     {

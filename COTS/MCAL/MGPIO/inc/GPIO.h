@@ -43,7 +43,7 @@ typedef enum
     PIN12,          /**< GPIO Pin 12 */
     PIN13,          /**< GPIO Pin 13 */
     PIN14,          /**< GPIO Pin 14 */
-    PIN15 = 0xFFUL, /**< GPIO Pin 15 */
+    PIN15 = 0x0FUL, /**< GPIO Pin 15 */
 } MGPIO_enuPinDesignator_t;
 
 /**
