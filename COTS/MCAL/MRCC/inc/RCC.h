@@ -181,9 +181,9 @@ typedef enum
 typedef struct 
 {
     uint32_t M_Prescaler : 6; /**< M Prescaler */
-    uint32_t P_Prescaler : 9; /**< P Prescaler */
+    uint32_t P_Prescaler : 2; /**< P Prescaler */
     uint32_t Q_Prescaler : 4; /**< Q Prescaler */
-    uint32_t N_Multiplier : 2; /**< N Multiplier */
+    uint32_t N_Multiplier : 9; /**< N Multiplier */
     uint32_t CLK_Src : 1; /**< Clock Source */
 } MRCC_structPLLConfig_t;
 
@@ -193,6 +193,7 @@ typedef struct
  */
 typedef enum 
 {
+    MRCC_AHB_DIV_BY_1 = (0b0111U), /**< AHB Clock divided by 1 */
     MRCC_AHB_DIV_BY_2 = (0b1000U), /**< AHB Clock divided by 2 */
     MRCC_AHB_DIV_BY_4 = (0b1001U), /**< AHB Clock divided by 4 */
     MRCC_AHB_DIV_BY_8 = (0b1010U), /**< AHB Clock divided by 8 */
@@ -209,6 +210,7 @@ typedef enum
  */
 typedef enum 
 {
+    MRCC_APB_DIV_BY_1 = (0b011U), /**< APB Clock divided by 1 */
     MRCC_APB_DIV_BY_2 = (0b100U), /**< APB Clock divided by 2 */
     MRCC_APB_DIV_BY_4 = (0b101U), /**< APB Clock divided by 4 */
     MRCC_APB_DIV_BY_8 = (0b110U), /**< APB Clock divided by 8 */
@@ -231,8 +233,8 @@ typedef enum
  */
 typedef struct
 {
-    uint8_t APB_LowSpeedPrescaler; /**< APB Low Speed Prescaler */
-    uint8_t APB_HighSpeedPrescaler; /**< APB High Speed Prescaler */
+    uint8_t APB_LowSpeedPrescaler; /**< APB1 Low Speed Prescaler */
+    uint8_t APB_HighSpeedPrescaler; /**< APB2 High Speed Prescaler */
     uint16_t AHB_Prescaler; /**< AHB Prescaler */
 } MRCC_structBusClkPrescaler_t;
 

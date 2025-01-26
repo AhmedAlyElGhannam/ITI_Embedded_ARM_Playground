@@ -52,33 +52,33 @@
 /** @defgroup RCC_Validation_Macros
  *  @brief Macros for validating various RCC parameters.
  *  @{ */
-#define IS_VALID_PLL_CONFIG(CFG)            ((CFG) & MRCC_MASK_VERIFY_PLL_CFG) /**< Checks if the PLL configuration is valid */
-#define IS_NULL_PTR(PTR)                    (PTR == NULL) /**< Checks if a pointer is null */
-#define IS_VALID_SYS_CLK_SRC(SYSCLK)        ((SYSCLK != MRCC_SYS_CLK_HSI) && (SYSCLK != MRCC_SYS_CLK_HSE) && (SYSCLK != MRCC_SYS_CLK_PLL)) /**< Checks if the system clock source is valid */
-#define IS_PLL_ENABLED()                    (((RCC->CR) >> 24) & 0x01U)
-#define IS_INVALID_CLK(CLK)                 (MRCC_MASK_VERIFY_CLK_CTRL & (CLK))
-#define IS_INVALID_CLK_CFG(CFG)             (MRCC_MASK_VERIFY_CLK_CFG & (CFG))
-#define IS_INVALID_SYS_CLK_SRC(CLK)     (MRCC_MASK_VERIFY_SYS_CLK_SRC & (CLK))
-#define IS_VALID_PLL_CONFIG(CFG)    ((CFG) & MRCC_MASK_VERIFY_PLL_CFG) /**< Checks if the PLL configuration is valid */
-#define IS_INVALID_PLL_M_PRES_RANGE(M)  (((M) < 2) || ((M) > 63))
-#define IS_INVALID_PLL_N_MULT_RANGE(N)  (((N) < 192) || ((N) > 432))
-#define IS_INVALID_PLL_P_PRES_RANGE(P)  (((P) != 2) && ((P) != 4) && ((P) != 6) && ((P) != 8))
-#define IS_INVALID_PLL_Q_PRES_RANGE(Q)  (((Q) < 2) || ((Q) > 15))
-#define IS_INVALID_VCO_INPUT_FREQ(VCO)  (((VCO) < 1000000) || ((VCO) > 2000000))
-#define IS_INVALID_PLL_SRC(CLK)     ((CLK) & MRCC_MASK_VERIFY_PLL_SRC)
-#define IS_INVALID_AHB_CLK_PRESCALER(AHB)       (((AHB) < 0b1000) || ((AHB) > 0b1111))
-#define IS_INVALID_APB_LS_CLK_PRESCALER(APB)    (((APB) < 0b100) || ((APB) > 0b111))
+#define IS_VALID_PLL_CONFIG(CFG)                ((CFG) & MRCC_MASK_VERIFY_PLL_CFG) /**< Checks if the PLL configuration is valid */
+#define IS_NULL_PTR(PTR)                        (PTR == NULL) /**< Checks if a pointer is null */
+#define IS_VALID_SYS_CLK_SRC(SYSCLK)            ((SYSCLK != MRCC_SYS_CLK_HSI) && (SYSCLK != MRCC_SYS_CLK_HSE) && (SYSCLK != MRCC_SYS_CLK_PLL)) /**< Checks if the system clock source is valid */
+#define IS_PLL_ENABLED()                        (((RCC->CR) >> 24) & 0x01U)
+#define IS_INVALID_CLK(CLK)                     (MRCC_MASK_VERIFY_CLK_CTRL & (CLK))
+#define IS_INVALID_CLK_CFG(CFG)                 (MRCC_MASK_VERIFY_CLK_CFG & (CFG))
+#define IS_INVALID_SYS_CLK_SRC(CLK)             (MRCC_MASK_VERIFY_SYS_CLK_SRC & (CLK))
+#define IS_VALID_PLL_CONFIG(CFG)                ((CFG) & MRCC_MASK_VERIFY_PLL_CFG) /**< Checks if the PLL configuration is valid */
+#define IS_INVALID_PLL_M_PRES_RANGE(M)          (((M) < 2) || ((M) > 63))
+#define IS_INVALID_PLL_N_MULT_RANGE(N)          (((N) < 2) || ((N) > 432))
+#define IS_INVALID_PLL_P_PRES_RANGE(P)          (((P) != 2) && ((P) != 4) && ((P) != 6) && ((P) != 8))
+#define IS_INVALID_PLL_Q_PRES_RANGE(Q)          (((Q) < 2) || ((Q) > 15))
+#define IS_INVALID_VCO_INPUT_FREQ(VCO)          (((VCO) < 1000000) || ((VCO) > 2000000))
+#define IS_INVALID_PLL_SRC(CLK)                 ((CLK) & MRCC_MASK_VERIFY_PLL_SRC)
+#define IS_INVALID_AHB_CLK_PRESCALER(AHB)       (((AHB) < 0b0111) || ((AHB) > 0b1111))
+#define IS_INVALID_APB_LS_CLK_PRESCALER(APB)    (((APB) < 0b011) || ((APB) > 0b111))
 #define IS_INVALID_APB_HS_CLK_PRESCALER(APB)    (((APB) < 0b100) || ((APB) > 0b111))
-#define IS_PLLI2S_ENABLED()     (((RCC->CR) >> 26) & 0x01U)
-#define IS_INVALID_PLLI2S_N_MULT_RANGE(N)   (((N) < 0b000000010) || ((N) > 0b110110000))
-#define IS_INVALID_PLLI2S_R_PRES_RANGE(R)   (((R) < 0b010) || ((R) > 0b111))
-#define IS_INVALID_RTC_STATE_CONFIG(CFG)    ((CFG) & MRCC_MASK_RTC_STATE)
-#define IS_INVALID_HSE_BYPASS_CONFIG(CFG)   ((CFG) & MRCC_MASK_VERIFY_HSE_BYPASS_CONFIG)
-#define IS_INVALID_LSE_BYPASS_CONFIG(CFG)   ((CFG) & MRCC_MASK_VERIFY_LSE_BYPASS_CONFIG)
-#define IS_INVALID_CSS_CONFIG(CFG)     ((CFG) & MRCC_MASK_VERIFY_CSS_CONFIG)
-#define IS_INVALID_MCO_PRESCALER(PRE)   (((PRE) < 0b100) || ((PRE) > 0b111))
-#define IS_INVALID_TIMPRE_CONFIG(CFG)   ((CFG) & MRCC_MASK_VERIFY_TIMPRE_CONFIG)
-#define IS_INVALID_LS_CLK_CFG(CFG)         (MRCC_MASK_VERIFY_LS_CLK_CFG & (CFG))
+#define IS_PLLI2S_ENABLED()                     (((RCC->CR) >> 26) & 0x01U)
+#define IS_INVALID_PLLI2S_N_MULT_RANGE(N)       (((N) < 0b000000010) || ((N) > 0b110110000))
+#define IS_INVALID_PLLI2S_R_PRES_RANGE(R)       (((R) < 0b010) || ((R) > 0b111))
+#define IS_INVALID_RTC_STATE_CONFIG(CFG)        ((CFG) & MRCC_MASK_RTC_STATE)
+#define IS_INVALID_HSE_BYPASS_CONFIG(CFG)       ((CFG) & MRCC_MASK_VERIFY_HSE_BYPASS_CONFIG)
+#define IS_INVALID_LSE_BYPASS_CONFIG(CFG)       ((CFG) & MRCC_MASK_VERIFY_LSE_BYPASS_CONFIG)
+#define IS_INVALID_CSS_CONFIG(CFG)              ((CFG) & MRCC_MASK_VERIFY_CSS_CONFIG)
+#define IS_INVALID_MCO_PRESCALER(PRE)           (((PRE) < 0b100) || ((PRE) > 0b111))
+#define IS_INVALID_TIMPRE_CONFIG(CFG)           ((CFG) & MRCC_MASK_VERIFY_TIMPRE_CONFIG)
+#define IS_INVALID_LS_CLK_CFG(CFG)              (MRCC_MASK_VERIFY_LS_CLK_CFG & (CFG))
 
 /** @} */
 
