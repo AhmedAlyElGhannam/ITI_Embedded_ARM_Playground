@@ -1,4 +1,5 @@
 #include "std_types.h"
+#include "error_status.h"
 #include "RCC.h"
 #include "RCC_Reg.h"
 #include "GPIO.h"
@@ -7,13 +8,11 @@
 
 int main(void)
 {
-    MRCC_HSI_ENABLE();
+    // MRCC_HSI_ENABLE();
 
+    MRCC_enuSetClkSrcState(MRCC_HSI_CLK, MRCC_CLK_SRC_ENABLE);
     MRCC_enuSetSysClkSrc(MRCC_SYS_CLK_HSI);
-
-    MRCC_ENABLE_GPIOA_CLK();
-    MRCC_ENABLE_GPIOB_CLK();
-    MRCC_ENABLE_GPIOC_CLK();
+    MRCC_enuSetPeripheralClkState(MRCC_AHB1_GPIOA | MRCC_AHB1_GPIOB | MRCC_AHB1_GPIOC, MRCC_PERIPHERAL_CLK_ENABLE);
 
 MGPIO_enuSetPinMode(GPIOC, PIN15, GPOUT);
     

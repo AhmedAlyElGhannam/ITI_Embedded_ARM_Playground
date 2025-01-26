@@ -17,11 +17,13 @@ typedef enum
     RCC_PLL_INV_N,
     RCC_PLL_INV_P,
     RCC_PLL_INV_Q,
+    RCC_PLL_INV_R,
     RCC_INV_PLL_SRC,
     RCC_INV_AHB_CLK_PRE,
     RCC_INV_APB_LS_CLK_PRE,
     RCC_INV_APB_HS_CLK_PRE,
     RCC_INV_INT_RDY_STATE,
+    RCC_INV_MCO_PRE,
     GPIO_INV_PORT,
     GPIO_INV_PIN,
 } SRV_enuErrorStatus_t;
