@@ -13,7 +13,7 @@ int main(void)
     MRCC_enuSetSysClkSrc(MRCC_SYS_CLK_HSI);
     MRCC_enuSetPeripheralClkState(MRCC_AHB1_GPIOA | MRCC_AHB1_GPIOB | MRCC_AHB1_GPIOC, MRCC_PERIPHERAL_CLK_ENABLE);
 
-MGPIO_enuSetPinMode(GPIOC, PIN15, GPOUT);
+    MGPIO_enuSetPinMode(GPIOC, PIN15, GPOUT);
     
     while (true)
     {

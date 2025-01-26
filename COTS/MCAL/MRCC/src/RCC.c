@@ -742,39 +742,3 @@ SRV_enuErrorStatus_t MRCC_enuSetLSIClkState(MRCC_enuClkSrcState_t copy_enuLSClkS
 
     return ret_enuErrorStatus;
 }
-
-SRV_enuErrorStatus_t MRCC_enuSetLSُClkState(MRCC_enuClkSrcState_t copy_enuLSClkState)
-{
-    SRV_enuErrorStatus_t ret_enuErrorStatus = ALL_OK;
-    volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
-    uint16_t local_uint16Timeout = MRCC_CLK_WAIT_TIMEOUT;
-
-    if (IS_INVALID_LS_CLK_CFG(copy_enuLSClkState))
-    {
-        ret_enuErrorStatus = RCC_INV_CFG;
-    }
-    else 
-    {
-        /* clear before setting */
-        RCC->BDCR &= MRCC_MASK_VERIFY_LS_CLK_CFG;
-
-        /* if state is on -> set it : else -> leave it 0 */
-        if (copy_enuLSClkState == LS_CLK_ENABLE)
-        {
-            RCC->BDCR |= (0x01U);
-            /* wait until clock is ready */
-            while ((RCC->BDCR  & (~(0b10U))) && (local_uint16Timeout--));
-
-            /* if clk is supposed to be on && timeout reached 0 -> return error status */
-            if ((local_uint16Timeout == 0) && (RCC->BDCR & (0b10U)))
-            {
-                ret_enuErrorStatus = RCC_TIMEOUT;
-            }
-            else {}
-        }
-        else {}
-    }
-
-    return ret_enuErrorStatus;
-}
-
