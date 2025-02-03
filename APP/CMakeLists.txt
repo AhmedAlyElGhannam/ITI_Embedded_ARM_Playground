@@ -39,6 +39,7 @@ set(${PROJECT_NAME}_INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/inc/")
 set(MCAL_LIB
 	MRCC
 	MGPIO	
+    MNVIC
 )
 
 # looping over all libs to build them

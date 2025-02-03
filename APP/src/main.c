@@ -2,6 +2,7 @@
 #include "error_status.h"
 #include "RCC.h"
 #include "GPIO.h"
+#include "NVIC.h"
 
 
 int main(void)
