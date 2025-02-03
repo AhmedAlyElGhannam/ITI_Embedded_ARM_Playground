@@ -106,10 +106,10 @@ typedef enum
  */
 typedef enum
 {
-    MRCC_HSI_CLK = 0x00000003UL, /**< HSI Clock */
-    MRCC_HSE_CLK = 0x00030000UL, /**< HSE Clock */
-    MRCC_PLL_CLK = 0x03000000UL, /**< PLL Clock */
-    MRCC_PLLI2S_CLK = 0x0C000000UL, /**< PLLI2S Clock */
+    MRCC_HSI_CLK = 0U, /**< HSI Clock */
+    MRCC_HSE_CLK = 16U, /**< HSE Clock */
+    MRCC_PLL_CLK = 24U, /**< PLL Clock */
+    MRCC_PLLI2S_CLK = 26U, /**< PLLI2S Clock */
 } MRCC_enuClkType_t;
 
 /**
@@ -163,6 +163,8 @@ typedef enum
     MRCC_PLL_SRC_HSI = 0U, /**< HSI Clock Source for PLL */
     MRCC_PLL_SRC_HSE = 1U, /**< HSE Clock Source for PLL */
 } MRCC_enuPLLClkSource_t;
+
+
 
 /**
  * @enum MRCC_enuI2SClkSource_t
@@ -406,7 +408,7 @@ typedef struct
  * @param copy_enuClkSrcState New state of the clock source (enabled/disabled).
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuSetClkSrcState(MRCC_enuClkType_t copy_enuClk, MRCC_enuClkSrcState_t copy_enuClkSrcState);
+extern SRV_enuErrorStatus_t MRCC_enuSetClkSrcState(MRCC_enuClkType_t copy_enuClk, MRCC_enuClkSrcState_t copy_enuClkSrcState);
 
 /**
  * @brief Sets the system clock source.
@@ -414,7 +416,7 @@ SRV_enuErrorStatus_t MRCC_enuSetClkSrcState(MRCC_enuClkType_t copy_enuClk, MRCC_
  * @param copy_enuSysClkSrc System clock source to select.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc(MRCC_enuSysClkSrc_t copy_enuSysClkSrc);
+extern SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc(MRCC_enuSysClkSrc_t copy_enuSysClkSrc);
 
 /**
  * @brief Gets the current system clock source.
@@ -422,7 +424,7 @@ SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc(MRCC_enuSysClkSrc_t copy_enuSysClkSrc)
  * @param ptr_uint32SysClkSrc Pointer to store the current system clock source.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc(uint32_t* ptr_uint32SysClkSrc);
+extern SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc(uint32_t* ptr_uint32SysClkSrc);
 
 /**
  * @}
@@ -439,7 +441,7 @@ SRV_enuErrorStatus_t MRCC_enuGetSysClkSrc(uint32_t* ptr_uint32SysClkSrc);
  * @param copy_enuPeripheralClkState New state of the peripheral clock.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuSetPeripheralClkState(uint64_t copy_uint64Peripheral, MRCC_enuPeripheralClkState_t copy_enuPeripheralClkState);
+extern SRV_enuErrorStatus_t MRCC_enuSetPeripheralClkState(uint64_t copy_uint64Peripheral, MRCC_enuPeripheralClkState_t copy_enuPeripheralClkState);
 
 /**
  * @brief Configures the RTC clock state.
@@ -447,7 +449,7 @@ SRV_enuErrorStatus_t MRCC_enuSetPeripheralClkState(uint64_t copy_uint64Periphera
  * @param copy_enuRTCState RTC clock state configuration.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuRTCStateConfig(MRCC_enumRTCStateConfig_t copy_enuRTCState);
+extern SRV_enuErrorStatus_t MRCC_enuRTCStateConfig(MRCC_enumRTCStateConfig_t copy_enuRTCState);
 
 /**
  * @}
@@ -463,7 +465,7 @@ SRV_enuErrorStatus_t MRCC_enuRTCStateConfig(MRCC_enumRTCStateConfig_t copy_enuRT
  * @param ptr_structPLLConfig Pointer to the PLL configuration structure.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_structPLLConfig_t* ptr_structPLLConfig);
+extern SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_structPLLConfig_t* ptr_structPLLConfig);
 
 /**
  * @brief Configures the PLLI2S settings.
@@ -471,7 +473,7 @@ SRV_enuErrorStatus_t MRCC_enuConfigPLL(MRCC_structPLLConfig_t* ptr_structPLLConf
  * @param ptr_structPLLConfig Pointer to the PLLI2S configuration structure.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuConfigPLLI2S(MRCC_structPLLI2CConfig_t* ptr_structPLLConfig);
+extern SRV_enuErrorStatus_t MRCC_enuConfigPLLI2S(MRCC_structPLLI2CConfig_t* ptr_structPLLConfig);
 
 /**
  * @}
@@ -487,7 +489,7 @@ SRV_enuErrorStatus_t MRCC_enuConfigPLLI2S(MRCC_structPLLI2CConfig_t* ptr_structP
  * @param ptr_structBusClkPrescalers Pointer to the bus clock prescaler configuration structure.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuSetBusClkPrescaler(MRCC_structBusClkPrescaler_t* ptr_structBusClkPrescalers);
+extern SRV_enuErrorStatus_t MRCC_enuSetBusClkPrescaler(MRCC_structBusClkPrescaler_t* ptr_structBusClkPrescalers);
 
 /**
  * @brief Sets the timer clock prescaler configuration.
@@ -495,7 +497,7 @@ SRV_enuErrorStatus_t MRCC_enuSetBusClkPrescaler(MRCC_structBusClkPrescaler_t* pt
  * @param copy_enuTimerClkPrescalerConfig Timer clock prescaler configuration.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuSetTimerPrescaler(MRCC_enuTimerClkPrescalerConfig_t copy_enuTimerClkPrescalerConfig);
+extern SRV_enuErrorStatus_t MRCC_enuSetTimerPrescaler(MRCC_enuTimerClkPrescalerConfig_t copy_enuTimerClkPrescalerConfig);
 
 /**
  * @}
@@ -511,7 +513,7 @@ SRV_enuErrorStatus_t MRCC_enuSetTimerPrescaler(MRCC_enuTimerClkPrescalerConfig_t
  * @param ptr_structClkReadyInterrupt Pointer to the clock ready interrupt configuration structure.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuSetClkReadyInterruptState(MRCC_structClkReadyInterrupt_t* ptr_structClkReadyInterrupt);
+extern SRV_enuErrorStatus_t MRCC_enuSetClkReadyInterruptState(MRCC_structClkReadyInterrupt_t* ptr_structClkReadyInterrupt);
 
 /**
  * @brief Gets the raised clock reset flags.
@@ -519,7 +521,7 @@ SRV_enuErrorStatus_t MRCC_enuSetClkReadyInterruptState(MRCC_structClkReadyInterr
  * @param ptr_structClkResetFlags Pointer to the structure to store the raised flags.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuGetRaisedClkResetFlags(MRCC_structClkResetFlags_t* ptr_structClkResetFlags);
+extern SRV_enuErrorStatus_t MRCC_enuGetRaisedClkResetFlags(MRCC_structClkResetFlags_t* ptr_structClkResetFlags);
 
 /**
  * @brief Gets the raised clock ready interrupt flags.
@@ -527,52 +529,52 @@ SRV_enuErrorStatus_t MRCC_enuGetRaisedClkResetFlags(MRCC_structClkResetFlags_t* 
  * @param ptr_structClkInterruptFlags Pointer to the structure to store the raised flags.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuGetRaisedClkReadyInterruptFlags(MRCC_structClkReadyInterruptFlags_t* ptr_structClkInterruptFlags);
+extern SRV_enuErrorStatus_t MRCC_enuGetRaisedClkReadyInterruptFlags(MRCC_structClkReadyInterruptFlags_t* ptr_structClkInterruptFlags);
 
 /**
  * @brief Clears the CSS flag.
  */
-inline void MRCC_voidClrCSSFlag(void);
+extern void MRCC_voidClrCSSFlag(void);
 
 /**
  * @brief Clears the PLLI2S flag.
  */
-inline void MRCC_voidClrPLLI2SFlag(void);
+extern void MRCC_voidClrPLLI2SFlag(void);
 
 /**
  * @brief Clears the PLL flag.
  */
-inline void MRCC_voidClrPLLFlag(void);
+extern void MRCC_voidClrPLLFlag(void);
 
 /**
  * @brief Clears the HSE flag.
  */
-inline void MRCC_voidClrHSEFlag(void);
+extern void MRCC_voidClrHSEFlag(void);
 
 /**
  * @brief Clears the HSI flag.
  */
-inline void MRCC_voidClrHSIFlag(void);
+extern void MRCC_voidClrHSIFlag(void);
 
 /**
  * @brief Clears the LSE flag.
  */
-inline void MRCC_voidClrLSEFlag(void);
+extern void MRCC_voidClrLSEFlag(void);
 
 /**
  * @brief Clears the LSI flag.
  */
-inline void MRCC_voidClrLSIFlag(void);
+extern void MRCC_voidClrLSIFlag(void);
 
 /**
  * @brief Clears all reset flags.
  */
-inline void MRCC_voidClrResetFlags(void);
+extern void MRCC_voidClrResetFlags(void);
 
 /**
  * @brief Performs a backup domain reset.
  */
-inline void MRCC_voidPerformBackupDomainReset(void);
+extern void MRCC_voidPerformBackupDomainReset(void);
 
 /**
  * @}
@@ -588,7 +590,7 @@ inline void MRCC_voidPerformBackupDomainReset(void);
  * @param copy_enuConfig HSE bypass configuration. @see MRCC_enuHSEBypassConfig_t
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuHSEBypassConfig(MRCC_enuHSEBypassConfig_t copy_enuConfig);
+extern SRV_enuErrorStatus_t MRCC_enuHSEBypassConfig(MRCC_enuHSEBypassConfig_t copy_enuConfig);
 
 /**
  * @brief Configures the LSE bypass state.
@@ -596,7 +598,7 @@ SRV_enuErrorStatus_t MRCC_enuHSEBypassConfig(MRCC_enuHSEBypassConfig_t copy_enuC
  * @param copy_enuConfig LSE bypass configuration.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuLSEBypassConfig(MRCC_enuHSEBypassConfig_t copy_enuConfig);
+extern SRV_enuErrorStatus_t MRCC_enuLSEBypassConfig(MRCC_enuHSEBypassConfig_t copy_enuConfig);
 
 /**
  * @brief Configures the Clock Security System (CSS) state.
@@ -604,7 +606,7 @@ SRV_enuErrorStatus_t MRCC_enuLSEBypassConfig(MRCC_enuHSEBypassConfig_t copy_enuC
  * @param copy_enuConfig CSS state configuration.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_voidCSSStateConfig(MRCC_enuCSSStateConfig_t copy_enuConfig);
+extern SRV_enuErrorStatus_t MRCC_voidCSSStateConfig(MRCC_enuCSSStateConfig_t copy_enuConfig);
 
 /**
  * @brief Configures the MCO output.
@@ -612,7 +614,7 @@ SRV_enuErrorStatus_t MRCC_voidCSSStateConfig(MRCC_enuCSSStateConfig_t copy_enuCo
  * @param ptr_structMCOConfig Pointer to the MCO configuration structure.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuSetMCOConfig(MRCC_structMCOConfig_t* ptr_structMCOConfig);
+extern SRV_enuErrorStatus_t MRCC_enuSetMCOConfig(MRCC_structMCOConfig_t* ptr_structMCOConfig);
 
 /**
  * @brief Configures the RTC clock.
@@ -620,7 +622,7 @@ SRV_enuErrorStatus_t MRCC_enuSetMCOConfig(MRCC_structMCOConfig_t* ptr_structMCOC
  * @param ptr_structRTCConfig Pointer to the RTC configuration structure.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuSetRTCConfig(MRCC_structRTCConfig_t* ptr_structRTCConfig);
+extern SRV_enuErrorStatus_t MRCC_enuSetRTCConfig(MRCC_structRTCConfig_t* ptr_structRTCConfig);
 
 /**
  * @brief Configures the PLL spread spectrum settings.
@@ -628,7 +630,7 @@ SRV_enuErrorStatus_t MRCC_enuSetRTCConfig(MRCC_structRTCConfig_t* ptr_structRTCC
  * @param ptr_structSpreadSpectrumConfig Pointer to the spread spectrum configuration structure.
  * @return SRV_enuErrorStatus_t Error status.
  */
-SRV_enuErrorStatus_t MRCC_enuSetPLLSpreadSpectrumConfig(MRCC_structSpeadSpectrumClkGenConfig_t* ptr_structSpreadSpectrumConfig);
+extern SRV_enuErrorStatus_t MRCC_enuSetPLLSpreadSpectrumConfig(MRCC_structSpeadSpectrumClkGenConfig_t* ptr_structSpreadSpectrumConfig);
 
 /**
  * @}

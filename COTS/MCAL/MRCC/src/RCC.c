@@ -52,33 +52,33 @@
 /** @defgroup RCC_Validation_Macros
  *  @brief Macros for validating various RCC parameters.
  *  @{ */
-#define IS_VALID_PLL_CONFIG(CFG)                ((CFG) & MRCC_MASK_VERIFY_PLL_CFG) /**< Checks if the PLL configuration is valid */
-#define IS_NULL_PTR(PTR)                        (PTR == NULL) /**< Checks if a pointer is null */
-#define IS_VALID_SYS_CLK_SRC(SYSCLK)            ((SYSCLK != MRCC_SYS_CLK_HSI) && (SYSCLK != MRCC_SYS_CLK_HSE) && (SYSCLK != MRCC_SYS_CLK_PLL)) /**< Checks if the system clock source is valid */
-#define IS_PLL_ENABLED()                        (((RCC->CR) >> 24) & 0x01U)
-#define IS_INVALID_CLK(CLK)                     (MRCC_MASK_VERIFY_CLK_CTRL & (CLK))
-#define IS_INVALID_CLK_CFG(CFG)                 (MRCC_MASK_VERIFY_CLK_CFG & (CFG))
-#define IS_INVALID_SYS_CLK_SRC(CLK)             (MRCC_MASK_VERIFY_SYS_CLK_SRC & (CLK))
-#define IS_VALID_PLL_CONFIG(CFG)                ((CFG) & MRCC_MASK_VERIFY_PLL_CFG) /**< Checks if the PLL configuration is valid */
-#define IS_INVALID_PLL_M_PRES_RANGE(M)          (((M) < 2) || ((M) > 63))
-#define IS_INVALID_PLL_N_MULT_RANGE(N)          (((N) < 2) || ((N) > 432))
-#define IS_INVALID_PLL_P_PRES_RANGE(P)          (((P) != 2) && ((P) != 4) && ((P) != 6) && ((P) != 8))
-#define IS_INVALID_PLL_Q_PRES_RANGE(Q)          (((Q) < 2) || ((Q) > 15))
-#define IS_INVALID_VCO_INPUT_FREQ(VCO)          (((VCO) < 1000000) || ((VCO) > 2000000))
-#define IS_INVALID_PLL_SRC(CLK)                 ((CLK) & MRCC_MASK_VERIFY_PLL_SRC)
+#define IS_VALID_PLL_CONFIG(CFG)            ((CFG) & MRCC_MASK_VERIFY_PLL_CFG) /**< Checks if the PLL configuration is valid */
+#define IS_NULL_PTR(PTR)                    (PTR == NULL) /**< Checks if a pointer is null */
+#define IS_VALID_SYS_CLK_SRC(SYSCLK)        ((SYSCLK != MRCC_SYS_CLK_HSI) && (SYSCLK != MRCC_SYS_CLK_HSE) && (SYSCLK != MRCC_SYS_CLK_PLL)) /**< Checks if the system clock source is valid */
+#define IS_PLL_ENABLED()                    (((RCC->CR) >> 24) & 0x01U)
+#define IS_INVALID_CLK(CLK)                 (MRCC_MASK_VERIFY_CLK_CTRL & (1U << (CLK)))
+#define IS_INVALID_CLK_CFG(CFG)             (MRCC_MASK_VERIFY_CLK_CFG & (CFG))
+#define IS_INVALID_SYS_CLK_SRC(CLK)     (MRCC_MASK_VERIFY_SYS_CLK_SRC & (CLK))
+#define IS_VALID_PLL_CONFIG(CFG)    ((CFG) & MRCC_MASK_VERIFY_PLL_CFG) /**< Checks if the PLL configuration is valid */
+#define IS_INVALID_PLL_M_PRES_RANGE(M)  (((M) < 2) || ((M) > 63))
+#define IS_INVALID_PLL_N_MULT_RANGE(N)  (((N) < 50) || ((N) > 432))
+#define IS_INVALID_PLL_P_PRES_RANGE(P)  (((P) < 0) || ((P) > 3))
+#define IS_INVALID_PLL_Q_PRES_RANGE(Q)  (((Q) < 2) || ((Q) > 15))
+#define IS_INVALID_VCO_INPUT_FREQ(VCO)  (((VCO) < 1000000) || ((VCO) > 2000000))
+#define IS_INVALID_PLL_SRC(CLK)     ((CLK) & MRCC_MASK_VERIFY_PLL_SRC)
 #define IS_INVALID_AHB_CLK_PRESCALER(AHB)       (((AHB) < 0b0111) || ((AHB) > 0b1111))
 #define IS_INVALID_APB_LS_CLK_PRESCALER(APB)    (((APB) < 0b011) || ((APB) > 0b111))
-#define IS_INVALID_APB_HS_CLK_PRESCALER(APB)    (((APB) < 0b100) || ((APB) > 0b111))
-#define IS_PLLI2S_ENABLED()                     (((RCC->CR) >> 26) & 0x01U)
-#define IS_INVALID_PLLI2S_N_MULT_RANGE(N)       (((N) < 0b000000010) || ((N) > 0b110110000))
-#define IS_INVALID_PLLI2S_R_PRES_RANGE(R)       (((R) < 0b010) || ((R) > 0b111))
-#define IS_INVALID_RTC_STATE_CONFIG(CFG)        ((CFG) & MRCC_MASK_RTC_STATE)
-#define IS_INVALID_HSE_BYPASS_CONFIG(CFG)       ((CFG) & MRCC_MASK_VERIFY_HSE_BYPASS_CONFIG)
-#define IS_INVALID_LSE_BYPASS_CONFIG(CFG)       ((CFG) & MRCC_MASK_VERIFY_LSE_BYPASS_CONFIG)
-#define IS_INVALID_CSS_CONFIG(CFG)              ((CFG) & MRCC_MASK_VERIFY_CSS_CONFIG)
-#define IS_INVALID_MCO_PRESCALER(PRE)           (((PRE) < 0b100) || ((PRE) > 0b111))
-#define IS_INVALID_TIMPRE_CONFIG(CFG)           ((CFG) & MRCC_MASK_VERIFY_TIMPRE_CONFIG)
-#define IS_INVALID_LS_CLK_CFG(CFG)              (MRCC_MASK_VERIFY_LS_CLK_CFG & (CFG))
+#define IS_INVALID_APB_HS_CLK_PRESCALER(APB)    (((APB) < 0b011) || ((APB) > 0b111))
+#define IS_PLLI2S_ENABLED()     (((RCC->CR) >> 26) & 0x01U)
+#define IS_INVALID_PLLI2S_N_MULT_RANGE(N)   (((N) < 0b000000010) || ((N) > 0b110110000))
+#define IS_INVALID_PLLI2S_R_PRES_RANGE(R)   (((R) < 0b010) || ((R) > 0b111))
+#define IS_INVALID_RTC_STATE_CONFIG(CFG)    ((CFG) & MRCC_MASK_RTC_STATE)
+#define IS_INVALID_HSE_BYPASS_CONFIG(CFG)   ((CFG) & MRCC_MASK_VERIFY_HSE_BYPASS_CONFIG)
+#define IS_INVALID_LSE_BYPASS_CONFIG(CFG)   ((CFG) & MRCC_MASK_VERIFY_LSE_BYPASS_CONFIG)
+#define IS_INVALID_CSS_CONFIG(CFG)     ((CFG) & MRCC_MASK_VERIFY_CSS_CONFIG)
+#define IS_INVALID_MCO_PRESCALER(PRE)   (((PRE) < 0b100) || ((PRE) > 0b111))
+#define IS_INVALID_TIMPRE_CONFIG(CFG)   ((CFG) & MRCC_MASK_VERIFY_TIMPRE_CONFIG)
+#define IS_INVALID_LS_CLK_CFG(CFG)         (MRCC_MASK_VERIFY_LS_CLK_CFG & (CFG))
 
 /** @} */
 
@@ -123,18 +123,11 @@ SRV_enuErrorStatus_t MRCC_enuSetClkSrcState(MRCC_enuClkType_t copy_enuClk, MRCC_
     }
     else 
     {
-        /* clear before setting */
-        RCC->CR &= (~copy_enuClk);
 
-        /* if state is on -> set it : else -> leave it 0 */
-        if (copy_enuClkSrcState == MRCC_CLK_SRC_ENABLE)
-        {
-            RCC->CR |= (copy_enuClk);
-        }
-        else {}
+        RCC->CR = (RCC->CR & (~(copy_enuClkSrcState << copy_enuClk))) | (copy_enuClkSrcState << copy_enuClk);
 
-        /* wait until clock is ready */
-        while ((RCC->CR & (~copy_enuClk)) && (local_uint16Timeout--));
+        /* wait until clock is ready CHANGE TO READY BIT */
+        while (!((RCC->CR >> (copy_enuClk + 1UL)) & 1UL) && (--local_uint16Timeout));
 
         /* if clk is supposed to be on && timeout reached 0 -> return error status */
         if ((local_uint16Timeout == 0) && (RCC->CR & copy_enuClk))
@@ -165,10 +158,9 @@ SRV_enuErrorStatus_t MRCC_enuSetSysClkSrc(MRCC_enuSysClkSrc_t copy_enuSysClkSrc)
     else
     {
         /* clear before setting */
-        RCC->CFGR &= (~copy_enuSysClkSrc);
 
         /* Set system clock source */
-        RCC->CFGR |= copy_enuSysClkSrc;
+        RCC->CFGR = (RCC->CFGR & (~copy_enuSysClkSrc))| copy_enuSysClkSrc;
     }
 
     return ret_enuErrorStatus;
@@ -500,56 +492,56 @@ SRV_enuErrorStatus_t MRCC_enuGetRaisedClkReadyInterruptFlags(MRCC_structClkReady
     return ret_enuErrorStatus;
 }
 
-inline void MRCC_voidClrCSSFlag(void)
+void MRCC_voidClrCSSFlag(void)
 {
     volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
     RCC->CIR |= (MRCC_MASK_CLR_CSS_FLAG);
 }
 
-inline void MRCC_voidClrPLLI2SFlag(void)
+void MRCC_voidClrPLLI2SFlag(void)
 {
     volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
     RCC->CIR |= (MRCC_MASK_CLR_PLLI2S_FLAG);
 }
 
-inline void MRCC_voidClrPLLFlag(void)
+void MRCC_voidClrPLLFlag(void)
 {
     volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
     RCC->CIR |= (MRCC_MASK_CLR_PLL_FLAG);
 }
 
-inline void MRCC_voidClrHSEFlag(void)
+void MRCC_voidClrHSEFlag(void)
 {
     volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
     RCC->CIR |= (MRCC_MASK_CLR_HSE_FLAG);
 }
 
-inline void MRCC_voidClrHSIFlag(void)
+void MRCC_voidClrHSIFlag(void)
 {
     volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
     RCC->CIR |= (MRCC_MASK_CLR_HSI_FLAG);
 }
 
-inline void MRCC_voidClrLSEFlag(void)
+void MRCC_voidClrLSEFlag(void)
 {
     volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
     RCC->CIR |= (MRCC_MASK_CLR_LSE_FLAG);
 }
 
-inline void MRCC_voidClrLSIFlag(void)
+void MRCC_voidClrLSIFlag(void)
 {
     volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
     RCC->CIR |= (MRCC_MASK_CLR_LSI_FLAG);
 }
 
-inline void MRCC_voidClrResetFlags(void)
+void MRCC_voidClrResetFlags(void)
 {
     volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
     RCC->CSR &= ~MRCC_MASK_CLR_RST_FLAGS;
     RCC->CSR |= MRCC_MASK_CLR_RST_FLAGS;
 }
 
-inline void MRCC_voidPerformBackupDomainReset(void)
+void MRCC_voidPerformBackupDomainReset(void)
 {
     volatile RCC_Registers_t* RCC = (volatile RCC_Registers_t*)RCC_BASE_ADDRESS;
     RCC->BDCR |= (0x00010000UL);
@@ -742,3 +734,4 @@ SRV_enuErrorStatus_t MRCC_enuSetLSIClkState(MRCC_enuClkSrcState_t copy_enuLSClkS
 
     return ret_enuErrorStatus;
 }
+

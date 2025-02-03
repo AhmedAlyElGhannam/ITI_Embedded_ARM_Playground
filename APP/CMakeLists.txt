@@ -49,11 +49,9 @@ foreach(mcal_lib ${MCAL_LIB})
 	)
 endforeach()
 
-# # defining a list of HAL libraries that app depends on
+# defining a list of HAL libraries that app depends on
 # set(HAL_LIB
 # 	HLED
-# 	HSWITCH
-# 	H7SEGMENT
 # )
 
 # # looping over all HAL libs to build them
@@ -110,7 +108,7 @@ target_link_options( ${PROJECT_NAME}.elf
 target_link_libraries(${PROJECT_NAME}.elf 
     PRIVATE 
     ${MCAL_LIB} 
-    #${HAL_LIB}
+    ${HAL_LIB}
 )
 
 # include directory for target
@@ -120,10 +118,10 @@ target_include_directories(${PROJECT_NAME}.elf
 )
 
 # calling macro for converting .elf into .hex
-convertToHex(${PROJECT_NAME})
+# convertTo_hex_or_bin(${PROJECT_NAME} ".hex")
 
 # calling macro for flashing .hex on mcu
-flashHEX(${PROJECT_NAME})
+convertTo_hex_or_bin_and_flash(${PROJECT_NAME} ${FLASHING_TOOL} "hex")
 
 # modify the clean build rule to delete generated .hex && .bin files
 # set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_NAME}.hex ${PROJECT_NAME}.bin)
