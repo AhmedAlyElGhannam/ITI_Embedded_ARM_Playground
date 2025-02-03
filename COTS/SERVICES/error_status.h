@@ -26,6 +26,8 @@ typedef enum
     RCC_INV_MCO_PRE,
     GPIO_INV_PORT,
     GPIO_INV_PIN,
+    NVIC_INV_IRQ_NUM,
+    NVIC_INV_IRQ_PRI,
 } SRV_enuErrorStatus_t;
 
 

@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "nvic_reg.h": "c",
+        "error_status.h": "c"
+    }
+}
