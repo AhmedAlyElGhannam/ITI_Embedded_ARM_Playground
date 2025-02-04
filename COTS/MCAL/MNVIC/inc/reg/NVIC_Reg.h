@@ -3,6 +3,7 @@
 
 typedef struct 
 {
+    const uint32_t RESERVED[64]; // 16 bytes in-between
     volatile uint32_t ISER[8]; // set enable
     const uint32_t RESERVED0[24]; // 96 bytes in-between
     volatile uint32_t ICER[8]; // clear enable
@@ -18,6 +19,6 @@ typedef struct
     volatile uint32_t STIR; // software trigger
 } NVIC_Registers_t;
 
-#define NVIC_BASE_ADDRESS ((volatile void*)0xE000E100)
+#define NVIC_BASE_ADDRESS ((volatile void*)0xE000E000)
 
 #endif

@@ -177,3 +177,13 @@ SRV_enuErrorStatus_t MNVIC_enuSWTriggerIRQ(uint8_t Copy_uint8IntNumber)
 
     return ret_enuErrorStatus;
 }
+
+void MNVIC_voidEnableAllIRQ(void)
+{
+    __asm volatile ("CPSIE i" : : : "memory");
+}
+
+void MNVIC_voidDisableAllIRQ(void)
+{
+    __asm volatile ("CPSID i" : : : "memory");
+}
