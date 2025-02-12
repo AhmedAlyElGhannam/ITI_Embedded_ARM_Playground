@@ -8,7 +8,7 @@ macro(convert_to_hex_and_flash)
 
     add_custom_target(flash
         DEPENDS convert-elf-to-hex 
-        COMMAND ${OCD} -d2 -s ${OCD_FIND_SCRIPT_PATH} -f ${OCD_FLASHER_CFG} -c "transport select hla_swd" -f ${OCD_TARGET_CFG} -c "program {${CMAKE_BINARY_DIR}/${PROJECT_NAME}.hex}  verify reset; shutdown;"
+        COMMAND "/usr/bin/openocd" -d2 -f /usr/share/openocd/scripts/interface/stlink.cfg -c "transport select hla_swd" -f /usr/share/openocd/scripts/target/stm32f4x.cfg -c "program ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.elf verify reset; shutdown;"
         COMMENT "Flashing .hex to target MCU"
     )
 endmacro()

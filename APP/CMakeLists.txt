@@ -40,7 +40,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 set(LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/linker_script/STM32F401CCFX_FLASH.ld)
 
 # define a variable to store startup file name and path for this project
-set(STARTUP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/startup/startup_stm32f401xc.S)
+set(STARTUP_FILES "${CMAKE_CURRENT_SOURCE_DIR}/startup/startup_stm32f401xc.S ${CMAKE_CURRENT_SOURCE_DIR}/startup/system_stm32f4xx.c")
 
 # collect all .c files for app
 file(GLOB_RECURSE ${PROJECT_NAME}_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
@@ -116,7 +116,7 @@ target_link_options(${PROJECT_NAME}.elf  PRIVATE
     -lstdc++
     -Wl,--end-group
     -Wl,--print-memory-usage
-    -specs=nano.specs
+    # -specs=nano.specs
     -specs=nosys.specs
     --entry=_estack
     --data-sections

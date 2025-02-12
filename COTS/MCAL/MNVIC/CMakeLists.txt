@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 # include toolchain cmake script
-include(${CMAKE_CURRENT_SOURCE_DIR}/../TOOLCHAIN/gcc-arm-none-eabi.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../../../TOOLCHAIN/gcc-arm-none-eabi.cmake)
 
 # project name + defining used languages
 project(MNVIC)
@@ -48,7 +48,7 @@ target_compile_options(${PROJECT_NAME}.elf PRIVATE
 )
 
 # linker options for target
-target_link_options(${PROJECT_NAME}.elf  PRIVATE
+target_link_options(${PROJECT_NAME}  PRIVATE
     -T${LINKER_SCRIPT}
     ${CPU_PARAMETERS}
     -Wl,-Map=${CMAKE_PROJECT_NAME}.map
@@ -60,7 +60,7 @@ target_link_options(${PROJECT_NAME}.elf  PRIVATE
     -lstdc++
     -Wl,--end-group
     -Wl,--print-memory-usage
-    -specs=nano.specs
+    # -specs=nano.specs
     -specs=nosys.specs
     --entry=_estack
     --data-sections

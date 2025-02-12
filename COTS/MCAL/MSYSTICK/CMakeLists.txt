@@ -26,7 +26,7 @@ set(${PROJECT_NAME}_INC_DIRS "${${PROJECT_NAME}_LIB_INC_DIR}" "${${PROJECT_NAME}
 add_library(${PROJECT_NAME} STATIC "${${PROJECT_NAME}_SRC_FILES}")
 
 # compiler options for target
-target_compile_options(${PROJECT_NAME}.elf PRIVATE
+target_compile_options(${PROJECT_NAME} PRIVATE
     ${CPU_PARAMETERS}
     -Wall
     -Wextra
@@ -48,7 +48,7 @@ target_compile_options(${PROJECT_NAME}.elf PRIVATE
 )
 
 # linker options for target
-target_link_options(${PROJECT_NAME}.elf  PRIVATE
+target_link_options(${PROJECT_NAME} PRIVATE
     -T${LINKER_SCRIPT}
     ${CPU_PARAMETERS}
     -Wl,-Map=${CMAKE_PROJECT_NAME}.map
@@ -60,7 +60,7 @@ target_link_options(${PROJECT_NAME}.elf  PRIVATE
     -lstdc++
     -Wl,--end-group
     -Wl,--print-memory-usage
-    -specs=nano.specs
+    # -specs=nano.specs
     -specs=nosys.specs
     --entry=_estack
     --data-sections
