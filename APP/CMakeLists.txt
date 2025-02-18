@@ -40,7 +40,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 set(LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/linker_script/STM32F401CCFX_FLASH.ld)
 
 # define a variable to store startup file name and path for this project
-set(STARTUP_FILES "${CMAKE_CURRENT_SOURCE_DIR}/startup/startup_stm32f401xc.S ${CMAKE_CURRENT_SOURCE_DIR}/startup/system_stm32f4xx.c")
+set(STARTUP_FILES "${CMAKE_CURRENT_SOURCE_DIR}/startup/startup_stm32f401xc.S" "${CMAKE_CURRENT_SOURCE_DIR}/startup/system_stm32f4xx.c")
 
 # collect all .c files for app
 file(GLOB_RECURSE ${PROJECT_NAME}_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)
@@ -79,7 +79,7 @@ endforeach()
 # endforeach()
 
 # compiling and getting .elf file
-add_executable(${PROJECT_NAME}.elf "${${PROJECT_NAME}_SRC_FILES}" ${STARTUP_FILE}) # main target
+add_executable(${PROJECT_NAME}.elf "${${PROJECT_NAME}_SRC_FILES}" ${STARTUP_FILES}) # main target
 
 # compiler options for target
 target_compile_options(${PROJECT_NAME}.elf PRIVATE
@@ -133,6 +133,7 @@ target_link_libraries(${PROJECT_NAME}.elf
 target_include_directories(${PROJECT_NAME}.elf 
     PRIVATE
     "${${PROJECT_NAME}_INC_DIR}"
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../COTS/STD_LIB/
 )
 
 # calling macro for converting .elf into .hex & flashing it to target
