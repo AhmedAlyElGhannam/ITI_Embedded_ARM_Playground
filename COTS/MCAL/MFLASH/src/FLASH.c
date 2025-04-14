@@ -1,3 +1,7 @@
+#include "std_types.h"
+#include "std_lib.h"
+#include "error_status.h"
+#include "FLASH_Reg.h"
 #include "FLASH.h"
 
 #define MFLASH_SECTOR0_16KB_START   (0x08000000UL)
@@ -18,6 +22,69 @@
 #define MFLASH_SECTOR7_128KB_END    (0x0807FFFFUL)
 
 
+static MFLASH_ptrCBF [NUM_OF_FLASH_IRQs] = {NULL};
+
+
+/*
+    @TODO: Make get + clr functions for these flags
+    Flags in SR (all are cleared by writing 1 to the same bit EXCEPT Busy flag (read-only))
+    Busy
+    Read Protection Error
+    Programming Sequence Error
+    Programming Parallelism Error
+    Programming Alignment Error
+    Write Protection Error
+    Operation Error
+    End of Operation
+*/
+
+uint8_t MFLASH_uint8IsFlashBusy(void)
+{
+    MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
+    return ((MFLASH->FLASH_SR >> 16) & 1);
+}
+
+uint8_t MFLASH_uint8IsReadProtectionErrRaised(void)
+{
+    MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
+    return ((MFLASH->FLASH_SR >> 8) & 1);
+}
+
+uint8_t MFLASH_uint8IsProgrammingSequenceErrRaised(void)
+{
+    MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
+    return ((MFLASH->FLASH_SR >> 7) & 1);
+}
+
+uint8_t MFLASH_uint8IsProgrammingParallelismErrRaised(void)
+{
+    MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
+    return ((MFLASH->FLASH_SR >> 6) & 1);
+}
+
+uint8_t MFLASH_uint8IsProgrammingAlignmentErrRaised(void)
+{
+    MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
+    return ((MFLASH->FLASH_SR >> 5) & 1);
+}
+
+uint8_t MFLASH_uint8IsWriteProtectionErrRaised(void)
+{
+    MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
+    return ((MFLASH->FLASH_SR >> 4) & 1);
+}
+
+uint8_t MFLASH_uint8IsOperationErrRaised(void)
+{
+    MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
+    return ((MFLASH->FLASH_SR >> 1) & 1);
+}
+
+uint8_t MFLASH_uint8IsEndOfOperation(void)
+{
+    MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
+    return ((MFLASH->FLASH_SR >> 0) & 1);
+}
 /*
     @TODO: Make get + clr functions for these flags
     Flags in SR (all are cleared by writing 1 to the same bit EXCEPT Busy flag (read-only))

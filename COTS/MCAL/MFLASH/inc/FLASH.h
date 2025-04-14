@@ -151,6 +151,8 @@ typedef enum
     RDP_LVL2, /*< debug/chip read protection disabled */
 } MFLASH_enuReadProtectionLevels_t;
 
+
+typedef void (*MFLASH_ptrCBF) (void);
 // typedef enum 
 // {
 //     PCROP_EN = 1U,
