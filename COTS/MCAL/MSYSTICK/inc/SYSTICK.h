@@ -1,37 +1,18 @@
 #ifndef SYSTICK_H
 #define SYSTICK_H
 
-savedSysClkHz = 0;
-savedsystick_cbf = NULL;
-systick_init(uint32_t systemClkHz)
-{
-    // step 1: save the system clock frequency
-    savedSysClkHz = systemClkHz;
+typedef void (*MSYSTICK_CBF_t)(void);
 
-    // step 2: enable int
-    // step 3: RELOAD -> 1ms
-    // step 4: clear current counter val
-}
-
-systick_setcbf(systick_cbf)
+typedef struct 
 {
-    if (systick_cbf != NULL)
-    {
-        savedsystick_cbf = systick_cbf;
-    }
-}
+    MSYSTICK_CBF_t CBF;
+    uint32_t cyclicTime;
+} MSYSTICK_structTimerConfig_t;
 
-systick_handler()
-{
-    passedMs++;
-}
-
-systick_delayms()
-{
-    
-}
-systick_setticktime();
-systick_stop();
-systick_start();
+extern void MSYSTICK_voidStart(void);
+extern void MSYSTICK_voidStop(void);
+// extern void Systick_Handler(void);
+extern SRV_enuErrorStatus_t MSYSTICK_enuSetCyclicTime(MSYSTICK_structTimerConfig_t* Copy_structTimerConfig);
+extern void MSYSTICK_voidInit(void);
 
 #endif
