@@ -85,22 +85,30 @@ uint8_t MFLASH_uint8IsEndOfOperation(void)
     MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
     return ((MFLASH->FLASH_SR >> 0) & 1);
 }
-/*
-    @TODO: Make get + clr functions for these flags
-    Flags in SR (all are cleared by writing 1 to the same bit EXCEPT Busy flag (read-only))
-    Busy
-    Read Protection Error
-    Programming Sequence Error
-    Programming Parallelism Error
-    Programming Alignment Error
-    Write Protection Error
-    Operation Error
-    End of Operation
-*/
 
-/* function for LOCK bit in CR */
+void MFLASH_voidLockFlash(void)
+{
+    MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
+    MFLASH->FLASH_CR |= (1 << 31);
+    return;
+}
 
-/* function for STRT bit in CR */
+void MFLASH_voidUnlockFlash(void)
+{
+    MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
+    MFLASH->FLASH_KEYR = MFLASH_KEY1;
+    MFLASH->FLASH_KEYR = MFLASH_KEY2;
+    return;
+}
+
+void MFLASH_voidStartEraseOperation(void)
+{
+    MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
+    MFLASH->FLASH_CR |= (1 << 16);
+    return;
+}
+
+
 
 /* function for mass erase (MER bit in CR)*/
 /* function for sector erase (SER bit in CR)*/

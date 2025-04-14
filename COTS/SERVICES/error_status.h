@@ -59,7 +59,7 @@ typedef enum
     DMA_INV_FIFO_THRESHOLD,
     DMA_MEMCPY_TIMEOUT,
     HUSART_INV_BUF_SIZE,
-    
+    // FLASH_
 } SRV_enuErrorStatus_t;
 
 
