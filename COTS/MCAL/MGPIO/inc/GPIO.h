@@ -64,22 +64,22 @@ typedef enum
  */
 typedef enum
 {
-    ALT_FUNC00 = 0x00UL, /**< Alternate Function 0 */
-    ALT_FUNC01 = 0x01UL, /**< Alternate Function 1 */
-    ALT_FUNC02 = 0x02UL, /**< Alternate Function 2 */
-    ALT_FUNC03 = 0x03UL, /**< Alternate Function 3 */
-    ALT_FUNC04 = 0x04UL, /**< Alternate Function 4 */
-    ALT_FUNC05 = 0x05UL, /**< Alternate Function 5 */
-    ALT_FUNC06 = 0x06UL, /**< Alternate Function 6 */
-    ALT_FUNC07 = 0x07UL, /**< Alternate Function 7 */
-    ALT_FUNC08 = 0x08UL, /**< Alternate Function 8 */
-    ALT_FUNC09 = 0x09UL, /**< Alternate Function 9 */
-    ALT_FUNC10 = 0x0AUL, /**< Alternate Function 10 */
-    ALT_FUNC11 = 0x0BUL, /**< Alternate Function 11 */
-    ALT_FUNC12 = 0x0CUL, /**< Alternate Function 12 */
-    ALT_FUNC13 = 0x0DUL, /**< Alternate Function 13 */
-    ALT_FUNC14 = 0x0EUL, /**< Alternate Function 14 */
-    ALT_FUNC15 = 0x0FUL, /**< Alternate Function 15 */
+    ALT_FUNC00 = 0x00UL, /**< Alternate Function 0: System */
+    ALT_FUNC01 = 0x01UL, /**< Alternate Function 1: TIM1/TIM2 */
+    ALT_FUNC02 = 0x02UL, /**< Alternate Function 2: TIM3..TIM5 */
+    ALT_FUNC03 = 0x03UL, /**< Alternate Function 3: TIM9..TIM11 */
+    ALT_FUNC04 = 0x04UL, /**< Alternate Function 4: I2C1..I2C3 */
+    ALT_FUNC05 = 0x05UL, /**< Alternate Function 5: SPI1..SPI4 */
+    ALT_FUNC06 = 0x06UL, /**< Alternate Function 6: SPI3 */
+    ALT_FUNC07 = 0x07UL, /**< Alternate Function 7: USART1..USART2 */
+    ALT_FUNC08 = 0x08UL, /**< Alternate Function 8: USART6 */
+    ALT_FUNC09 = 0x09UL, /**< Alternate Function 9: I2C2..3 */
+    ALT_FUNC10 = 0x0AUL, /**< Alternate Function 10: OTG_FS */
+    ALT_FUNC11 = 0x0BUL, /**< Alternate Function 11: ___ */
+    ALT_FUNC12 = 0x0CUL, /**< Alternate Function 12: SDIO */
+    ALT_FUNC13 = 0x0DUL, /**< Alternate Function 13: ___ */
+    ALT_FUNC14 = 0x0EUL, /**< Alternate Function 14: ___ */
+    ALT_FUNC15 = 0x0FUL, /**< Alternate Function 15: EVENTOUT */
     ALT_FUNC_NONE = 0xF0UL
 } MGPIO_enuPinAltFunc_t;
 
