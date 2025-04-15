@@ -108,7 +108,20 @@ void MFLASH_voidStartEraseOperation(void)
     return;
 }
 
+void MFLASH_voidLockOptionFlash(void)
+{
+    MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
+    MFLASH->FLASH_OPTCR |= (1 << 0);
+    return;
+}
 
+void MFLASH_voidUnlockOptionFlash(void)
+{
+    MFLASH_Registers_t* MFLASH = (MFLASH_Registers_t*)FLASH_PERIPHERAL_BASE_ADDRESS;
+    MFLASH->FLASH_OPTKEYR = MFLASH_OPTKEY1;
+    MFLASH->FLASH_OPTKEYR = MFLASH_OPTKEY2;
+    return;
+}
 
 /* function for mass erase (MER bit in CR)*/
 /* function for sector erase (SER bit in CR)*/
